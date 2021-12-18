@@ -1,18 +1,22 @@
+use macroquad::experimental::collections::storage;
 use macroquad::prelude::*;
 mod config;
 mod input;
 mod level;
 mod objects;
 mod physics;
+mod resources;
 mod state;
 use crate::config as conf;
 use crate::{config::window_conf, state::State};
+use std::error::Error;
+
+pub type Result<T> = ::std::result::Result<T, Box<dyn Error>>;
 
 #[macroquad::main(window_conf)]
-async fn main() {
-    let camera = conf::camera_conf();
+async fn main() -> Result<()> {
     let mut state = State::new();
-    set_camera(&camera);
+    storage::store(resources::Resources::new().await?);
     loop {
         clear_background(WHITE);
 
