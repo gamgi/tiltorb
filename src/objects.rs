@@ -1,5 +1,8 @@
+use crate::input::Input;
 use crate::state::State;
 use macroquad::prelude::*;
+
+pub fn update_objects(state: &State, input: &Input) {}
 
 pub fn draw_objects(state: &State) {
     match state {
