@@ -20,7 +20,7 @@ pub fn draw_objects(state: &State) {
         State::Menu(ref game) | State::Game(ref game) => {
             // Balls
             for ref ball in game.objects.balls.iter() {
-                draw_circle(ball.pos.x, ball.pos.y, 15.0, YELLOW);
+                draw_circle(ball.pos.x, ball.pos.y, 15.0, BLUE);
             }
             // Actuators
             for ref actuator in game.objects.actuators.iter() {
