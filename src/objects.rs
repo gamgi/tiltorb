@@ -1,12 +1,15 @@
 use crate::input::Input;
+use crate::physics;
 use crate::state::State;
 use macroquad::prelude::*;
 
 pub fn update_objects(state: &mut State, input: &Input) {
     match state {
         State::Game(game) => {
-            game.objects.actuators[0].pos.y -= input.actuator_left;
-            game.objects.actuators[1].pos.y -= input.actuator_right;
+            // Actuators
+            physics::update_actuators(&mut game.objects.actuators, input);
+            // Balls
+            physics::update_balls(&mut game.objects.balls, &game.objects.actuators);
         }
         _ => {}
     }

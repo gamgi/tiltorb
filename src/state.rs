@@ -1,5 +1,6 @@
 use crate::config::{SCREEN_H, SCREEN_W};
 use macroquad::math::Vec2;
+
 #[derive(Debug, PartialEq)]
 pub enum State {
     Menu(GameState),
