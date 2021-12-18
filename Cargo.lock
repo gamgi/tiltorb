@@ -3,13 +3,6 @@
 version = 3
 
 [[package]]
-name = "Tiltorb"
-version = "0.1.0"
-dependencies = [
- "macroquad",
-]
-
-[[package]]
 name = "adler32"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -400,6 +393,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b97fcaeba89edba30f044a10c6a3cc39df9c3f17d7cd829dd1446cab35f890e0"
 dependencies = [
  "maybe-uninit",
+]
+
+[[package]]
+name = "tilt_orb"
+version = "0.1.0"
+dependencies = [
+ "macroquad",
 ]
 
 [[package]]
