@@ -15,7 +15,3 @@ pub fn window_conf() -> Window {
         ..Default::default()
     }
 }
-
-pub fn camera_conf() -> Camera2D {
-    Camera2D::from_display_rect(Rect::new(0.0, 0.0, SCREEN_W, SCREEN_H))
-}

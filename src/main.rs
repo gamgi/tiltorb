@@ -22,6 +22,7 @@ async fn main() -> Result<()> {
 
         let input = input::update_input();
         objects::update_objects(&mut state, &input);
+        level::update_camera(&state);
         level::draw_level();
         objects::draw_objects(&state);
 

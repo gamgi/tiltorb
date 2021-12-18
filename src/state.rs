@@ -21,6 +21,7 @@ impl State {
                     },
                 ],
             },
+            camera: Vec2::new(0.0, 0.0),
         })
     }
 }
@@ -28,6 +29,7 @@ impl State {
 #[derive(Debug, PartialEq)]
 pub struct GameState {
     pub objects: GameObjectState,
+    pub camera: Vec2,
 }
 
 #[derive(Debug, PartialEq)]
