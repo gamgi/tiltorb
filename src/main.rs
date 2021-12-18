@@ -10,13 +10,13 @@ use crate::{config::window_conf, state::State};
 #[macroquad::main(window_conf)]
 async fn main() {
     let camera = conf::camera_conf();
-    set_camera(&camera);
     let mut state = State::new();
+    set_camera(&camera);
     loop {
         clear_background(WHITE);
 
         let input = input::update_input();
-        objects::update_objects(&state, &input);
+        objects::update_objects(&mut state, &input);
         level::draw_level();
         objects::draw_objects(&state);
 

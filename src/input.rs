@@ -1,8 +1,8 @@
 use macroquad::prelude::*;
 #[derive(Debug, PartialEq)]
 pub struct Input {
-    actuator_left: f32,
-    actuator_right: f32,
+    pub actuator_left: f32,
+    pub actuator_right: f32,
 }
 
 fn read_updown(up: KeyCode, down: KeyCode) -> f32 {
