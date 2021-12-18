@@ -1,10 +1,14 @@
-use crate::input::Input;
-use crate::state::{Actuator, Ball};
+use crate::{
+    config,
+    input::Input,
+    state::{Actuator, Ball},
+};
 use macroquad::math::Vec2;
 
 const GRAVITY: (f32, f32) = (0.0, 9.81);
 const ACTUATOR_VEL: (f32, f32) = (4.0, 4.0);
 const BALL_MASS: f32 = 10.0;
+const WALL_DAMPING: f32 = 0.4;
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     actuators[0].pos.y -= input.actuator_left * ACTUATOR_VEL.0;
@@ -17,6 +21,12 @@ pub fn update_balls(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
         ball.vel += Vec2::from(GRAVITY) / BALL_MASS;
         let max_y = seesaw_y(ball.pos.x, actuators);
 
+        if ball.pos.x < 0.0 || ball.pos.x > config::SCREEN_W {
+            // reset ball x
+            ball.pos.x = ball.pos.x.clamp(0.0, config::SCREEN_W);
+            // reflect ball velocity on x-axis
+            ball.vel.x *= -WALL_DAMPING;
+        }
         if ball.pos.y >= max_y {
             // reset ball y
             ball.pos.y = max_y;

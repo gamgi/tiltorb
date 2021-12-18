@@ -3,6 +3,7 @@ mod config;
 mod input;
 mod level;
 mod objects;
+mod physics;
 mod state;
 use crate::config as conf;
 use crate::{config::window_conf, state::State};
