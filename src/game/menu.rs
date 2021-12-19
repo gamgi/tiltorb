@@ -1,6 +1,8 @@
-use crate::input::Input;
-use crate::state::{Event, MenuState};
-use macroquad::prelude::*;
+use crate::{
+    input::Input,
+    state::{Event, MenuState},
+};
+use macroquad::{prelude::*, text::measure_text, time::get_time};
 
 pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
     if input.menu_up {
@@ -22,12 +24,23 @@ pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
 }
 
 pub fn draw_menu(menu: &MenuState) {
+    let scale = f32::sin(10.0 * get_time() as f32) * 2.5;
+    for (i, text) in menu.options.iter().enumerate() {
+        if menu.selected == i {
+            draw_centered_text(text, 250.0 + 30.0 + i as f32 * 30.0, 32.0 + scale);
+        } else {
+            draw_centered_text(text, 250.0 + 30.0 + i as f32 * 30.0, 30.0);
+        }
+    }
+}
+
+fn draw_centered_text(text: &str, y: f32, font_size: f32) {
+    let text_size = measure_text(text, None, font_size as u16, 1.0);
     draw_text(
-        &format!("menu {}", menu.selected.to_owned()),
-        30.0,
-        250.0,
-        30.0,
+        text,
+        screen_width() / 2.0 - text_size.width / 2.0,
+        y,
+        font_size,
         WHITE,
     );
-    draw_text("menu", 30.0, 200.0, 30.0, WHITE);
 }

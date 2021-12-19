@@ -23,7 +23,6 @@ impl State {
             (State::Initial, Event::Initialized) => return State::Loading,
             (State::Menu(game, _), Event::Selected(item)) => match item.as_str() {
                 "start" => {
-                    // self.0;
                     return State::Game(game);
                 }
                 "exit" => State::Terminating,
