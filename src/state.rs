@@ -46,6 +46,7 @@ impl State {
 pub struct GameState {
     pub objects: GameObjectState,
     pub camera: Vec2,
+    pub level: GameLevelState,
 }
 
 impl GameState {
@@ -65,6 +66,30 @@ impl GameState {
                 ],
             },
             camera: Vec2::new(0.0, 0.0),
+            level: GameLevelState {
+                holes: vec![
+                    Hole {
+                        pos: Vec2::new(0.0, 0.0),
+                        radius: 0.02,
+                    },
+                    Hole {
+                        pos: Vec2::new(0.1, 0.1),
+                        radius: 0.02,
+                    },
+                    Hole {
+                        pos: Vec2::new(0.2, 0.1),
+                        radius: 0.03,
+                    },
+                    Hole {
+                        pos: Vec2::new(0.9, 0.8),
+                        radius: 0.02,
+                    },
+                    Hole {
+                        pos: Vec2::new(1.0, 0.9),
+                        radius: 0.03,
+                    },
+                ],
+            },
         }
     }
 }
@@ -100,4 +125,15 @@ impl Ball {
             vel: Vec2::new(0.0, 0.0),
         }
     }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct GameLevelState {
+    pub holes: Vec<Hole>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Hole {
+    pub pos: Vec2,
+    pub radius: f32,
 }

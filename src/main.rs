@@ -2,6 +2,7 @@
 
 use macroquad::experimental::{collections::storage, coroutines::start_coroutine};
 use macroquad::prelude::*;
+
 mod config;
 mod game;
 mod input;
