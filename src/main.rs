@@ -1,14 +1,10 @@
 #![feature(async_closure)]
 
-use macroquad::experimental::{
-    collections::storage, coroutines::start_coroutine, coroutines::wait_seconds,
-};
+use macroquad::experimental::{collections::storage, coroutines::start_coroutine};
 use macroquad::prelude::*;
 mod config;
 mod game;
 mod input;
-mod level;
-mod objects;
 mod physics;
 mod resources;
 mod state;
@@ -66,13 +62,12 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
         State::Game(game) => loop {
             // Update
             let input = input::update_input();
-            objects::update_game(game, &input);
+            game::game::update_game(game, &input);
             // level::update_camera(&state);
 
             // Draw
             clear_background(WHITE);
-            level::draw_level();
-            objects::draw_game(&game);
+            game::game::draw_game(&game);
             next_frame().await
         },
         _ => Ok(None),
