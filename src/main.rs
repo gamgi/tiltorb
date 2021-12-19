@@ -54,7 +54,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
 
                 // Draw
                 clear_background(BLACK);
-                draw_text("menu", 30.0, 200.0, 30.0, WHITE);
+                game::menu::draw_menu(&menu);
                 next_frame().await
             }
             Ok(None)
