@@ -36,5 +36,6 @@ pub fn draw_objects(state: &State) {
                 BLUE,
             );
         }
+        _ => {}
     }
 }

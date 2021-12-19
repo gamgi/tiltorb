@@ -3,26 +3,38 @@ use macroquad::math::Vec2;
 
 #[derive(Debug, PartialEq)]
 pub enum State {
+    Initial,
+    Loading,
     Menu(GameState),
     Game(GameState),
 }
 
+#[derive(Debug, PartialEq)]
+pub enum Event {
+    Initialized,
+    Loaded,
+}
+
 impl State {
-    pub fn new() -> Self {
-        State::Game(GameState {
-            objects: GameObjectState {
-                balls: vec![Ball::new()],
-                actuators: [
-                    Actuator {
-                        pos: Vec2::new(0.0, SCREEN_H - 60.0),
-                    },
-                    Actuator {
-                        pos: Vec2::new(SCREEN_W - 60.0, SCREEN_H - 60.0),
-                    },
-                ],
-            },
-            camera: Vec2::new(0.0, 0.0),
-        })
+    pub fn transition(self, event: Event) -> Self {
+        match (&self, event) {
+            (State::Initial, Event::Initialized) => State::Loading,
+            (State::Loading, Event::Loaded) => State::Game(GameState {
+                objects: GameObjectState {
+                    balls: vec![Ball::new()],
+                    actuators: [
+                        Actuator {
+                            pos: Vec2::new(0.0, SCREEN_H - 60.0),
+                        },
+                        Actuator {
+                            pos: Vec2::new(SCREEN_W - 60.0, SCREEN_H - 60.0),
+                        },
+                    ],
+                },
+                camera: Vec2::new(0.0, 0.0),
+            }),
+            _ => self,
+        }
     }
 }
 
