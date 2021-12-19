@@ -7,6 +7,7 @@ pub enum State {
     Loading,
     Menu(GameState, MenuState),
     Game(GameState),
+    Terminating,
 }
 
 #[derive(Debug, PartialEq)]
@@ -18,16 +19,26 @@ pub enum Event {
 
 impl State {
     pub fn transition(self, event: Event) -> Self {
-        match (&self, event) {
-            (State::Initial, Event::Initialized) => State::Loading,
-            (State::Loading, Event::Loaded) => State::Menu(
-                GameState::new(),
-                MenuState {
-                    selected: 0,
-                    options: vec!["Start".to_string(), "Quit".to_string()],
-                },
-            ),
-            _ => self,
+        match (self, event) {
+            (State::Initial, Event::Initialized) => return State::Loading,
+            (State::Menu(game, _), Event::Selected(item)) => match item.as_str() {
+                "start" => {
+                    // self.0;
+                    return State::Game(game);
+                }
+                "exit" => State::Terminating,
+                _ => unreachable!(),
+            },
+            (State::Loading, Event::Loaded) => {
+                return State::Menu(
+                    GameState::new(),
+                    MenuState {
+                        selected: 0,
+                        options: vec!["Start".to_string(), "Quit".to_string()],
+                    },
+                )
+            }
+            (state, _) => state,
         }
     }
 }

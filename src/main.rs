@@ -24,11 +24,24 @@ async fn main() -> Result<()> {
         if let Some(ev) = event.take() {
             state = state.transition(ev);
             event = run(&mut state).await?;
+        } else if let State::Terminating = state {
+            break;
         } else {
             next_frame().await
         }
     }
     Ok::<(), _>(())
+}
+
+macro_rules! return_if_some {
+    ( $e:expr ) => {
+        match $e {
+            Some(v) => {
+                return Ok(Some(v));
+            }
+            None => {}
+        }
+    };
 }
 
 async fn run(state: &mut State) -> Result<Option<Event>> {
@@ -50,7 +63,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             loop {
                 // Update
                 let input = input::update_input();
-                game::menu::update_menu(menu, &input);
+                return_if_some!(game::menu::update_menu(menu, &input));
 
                 // Draw
                 clear_background(BLACK);
@@ -63,7 +76,6 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             // Update
             let input = input::update_input();
             game::game::update_game(game, &input);
-            // level::update_camera(&state);
 
             // Draw
             clear_background(WHITE);

@@ -1,13 +1,24 @@
 use crate::input::Input;
-use crate::state::MenuState;
+use crate::state::{Event, MenuState};
 use macroquad::prelude::*;
 
-pub fn update_menu(menu: &mut MenuState, input: &Input) {
+pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
     if input.menu_up {
         menu.selected = (menu.selected as i32 - 1).rem_euclid(menu.options.len() as i32) as usize;
     } else if input.menu_down {
         menu.selected = (menu.selected + 1).rem_euclid(menu.options.len());
     }
+
+    if input.enter {
+        return Some(Event::Selected(
+            menu.options
+                .get(menu.selected)
+                .unwrap()
+                .to_string()
+                .to_lowercase(),
+        ));
+    }
+    None
 }
 
 pub fn draw_menu(menu: &MenuState) {
