@@ -1,6 +1,7 @@
 use macroquad::miniquad::conf::Conf as Window;
 use macroquad::prelude::*;
 
+pub const SCALE: f32 = 1080.0; // 1m in pixels
 pub const WINDOW_W: i32 = 960;
 pub const WINDOW_H: i32 = 540;
 pub const SCREEN_W: f32 = 1920.0;

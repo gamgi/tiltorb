@@ -1,4 +1,4 @@
-use crate::config::{SCREEN_H, SCREEN_W};
+use crate::config::{SCALE, SCREEN_H, SCREEN_W};
 use macroquad::math::Vec2;
 
 #[derive(Debug, PartialEq)]
@@ -55,10 +55,12 @@ impl GameState {
                 balls: vec![Ball::new()],
                 actuators: [
                     Actuator {
-                        pos: Vec2::new(0.0, SCREEN_H - 60.0),
+                        pos: Vec2::new(0.0, (SCREEN_H - 60.0) / SCALE),
+                        vel: 0.0,
                     },
                     Actuator {
-                        pos: Vec2::new(SCREEN_W - 60.0, SCREEN_H - 60.0),
+                        pos: Vec2::new((SCREEN_W - 60.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                        vel: 0.0,
                     },
                 ],
             },
@@ -88,6 +90,7 @@ pub struct Ball {
 #[derive(Debug, PartialEq)]
 pub struct Actuator {
     pub pos: Vec2,
+    pub vel: f32,
 }
 
 impl Ball {
