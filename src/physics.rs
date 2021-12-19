@@ -7,9 +7,9 @@ use crate::{
 use macroquad::{math::Vec2, time::get_frame_time};
 
 const GRAVITY: (f32, f32) = (0.0, 9.81); // m/s
-const ACTUATOR_VEL: f32 = 1.0; // m/s TODO does not match reality
+const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
-const ACTUATOR_DAMPING: f32 = 5.0;
+const ACTUATOR_DAMPING: f32 = 8.0;
 const _BALL_MASS: f32 = 0.15; // kg
 const WALL_DAMPING: f32 = 0.4;
 
@@ -29,6 +29,9 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
 pub fn update_balls(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
     let dt = get_frame_time();
     for ball in balls.iter_mut() {
+        if !ball.active {
+            continue;
+        }
         ball.vel += dt * Vec2::from(GRAVITY);
         ball.pos += dt * ball.vel;
         let max_y = seesaw_y(ball.pos.x, actuators);

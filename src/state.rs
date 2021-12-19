@@ -69,24 +69,24 @@ impl GameState {
             level: GameLevelState {
                 holes: vec![
                     Hole {
-                        pos: Vec2::new(0.0, 0.0),
-                        radius: 0.02,
-                    },
-                    Hole {
                         pos: Vec2::new(0.1, 0.1),
-                        radius: 0.02,
+                        radius: 0.04,
                     },
                     Hole {
                         pos: Vec2::new(0.2, 0.1),
-                        radius: 0.03,
+                        radius: 0.04,
+                    },
+                    Hole {
+                        pos: Vec2::new(0.2, 0.8),
+                        radius: 0.05,
                     },
                     Hole {
                         pos: Vec2::new(0.9, 0.8),
-                        radius: 0.02,
+                        radius: 0.05,
                     },
                     Hole {
                         pos: Vec2::new(1.0, 0.9),
-                        radius: 0.03,
+                        radius: 0.04,
                     },
                 ],
             },
@@ -110,6 +110,7 @@ pub struct GameObjectState {
 pub struct Ball {
     pub pos: Vec2,
     pub vel: Vec2,
+    pub active: bool,
 }
 
 #[derive(Debug, PartialEq)]
@@ -123,6 +124,7 @@ impl Ball {
         Ball {
             pos: Vec2::new(0.0, 0.0),
             vel: Vec2::new(0.0, 0.0),
+            active: true,
         }
     }
 }

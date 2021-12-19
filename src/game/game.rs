@@ -2,11 +2,11 @@ use super::level;
 use crate::input::Input;
 use crate::physics;
 use crate::state::GameState;
-use crate::{config, config::SCALE, resources::Resources};
-use macroquad::experimental::collections::storage;
+use crate::{config, config::SCALE};
 use macroquad::prelude::*;
 
-// TODO update_state
+pub const BALL_RADIUS: f32 = 0.03;
+
 pub fn update_game(game: &mut GameState, input: &Input) {
     level::update_level(game);
     // Actuators
@@ -19,7 +19,12 @@ pub fn draw_game(game: &GameState) {
     level::draw_level(game);
     // Balls
     for ref ball in game.objects.balls.iter() {
-        draw_circle(ball.pos.x * SCALE, ball.pos.y * SCALE, 15.0, BLUE);
+        draw_circle(
+            ball.pos.x * SCALE,
+            ball.pos.y * SCALE,
+            BALL_RADIUS * SCALE,
+            BLUE,
+        );
     }
     // Actuators
     for ref actuator in game.objects.actuators.iter() {
@@ -34,9 +39,9 @@ pub fn draw_game(game: &GameState) {
     // Seesaw
     draw_line(
         game.objects.actuators[0].pos.x * SCALE,
-        game.objects.actuators[0].pos.y * SCALE,
+        game.objects.actuators[0].pos.y * SCALE + BALL_RADIUS * SCALE,
         game.objects.actuators[1].pos.x * SCALE,
-        game.objects.actuators[1].pos.y * SCALE,
+        game.objects.actuators[1].pos.y * SCALE + BALL_RADIUS * SCALE,
         15.0,
         BLUE,
     );
