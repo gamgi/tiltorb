@@ -52,10 +52,9 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
         }
         State::Menu(_, menu) => {
             loop {
-                // Update 
+                // Update
                 let input = input::update_input();
-                objects::update_objects(state, &input);
-                draw_text(&format!("menu {}", menu.selected.to_owned()), 30.0, 250.0, 30.0, WHITE);
+                game::menu::update_menu(menu, &input);
 
                 // Draw
                 clear_background(BLACK);
@@ -64,16 +63,16 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             }
             Ok(None)
         }
-        State::Game(_) => loop {
-            // Update 
+        State::Game(game) => loop {
+            // Update
             let input = input::update_input();
-            objects::update_objects(state, &input);
-            level::update_camera(&state);
+            objects::update_game(game, &input);
+            // level::update_camera(&state);
 
             // Draw
             clear_background(WHITE);
             level::draw_level();
-            objects::draw_objects(&state);
+            objects::draw_game(&game);
             next_frame().await
         },
         _ => Ok(None),
