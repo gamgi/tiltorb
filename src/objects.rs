@@ -3,8 +3,16 @@ use crate::physics;
 use crate::state::State;
 use macroquad::prelude::*;
 
+// TODO update_state
 pub fn update_objects(state: &mut State, input: &Input) {
     match state {
+        State::Menu(_, menu) => {
+            if input.menu_up {
+                menu.selected = menu.selected - 1 % menu.options.len();
+            } else if input.menu_down {
+                menu.selected = menu.selected + 1 % menu.options.len();
+            }
+        }
         State::Game(game) => {
             // Actuators
             physics::update_actuators(&mut game.objects.actuators, input);
@@ -13,11 +21,12 @@ pub fn update_objects(state: &mut State, input: &Input) {
         }
         _ => {}
     }
+    state
 }
 
 pub fn draw_objects(state: &State) {
     match state {
-        State::Menu(ref game) | State::Game(ref game) => {
+        State::Menu(ref game, _) | State::Game(ref game) => {
             // Balls
             for ref ball in game.objects.balls.iter() {
                 draw_circle(ball.pos.x, ball.pos.y, 15.0, BLUE);

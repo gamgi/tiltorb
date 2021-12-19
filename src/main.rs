@@ -1,8 +1,11 @@
 #![feature(async_closure)]
 
-use macroquad::experimental::{collections::storage, coroutines::start_coroutine};
+use macroquad::experimental::{
+    collections::storage, coroutines::start_coroutine, coroutines::wait_seconds,
+};
 use macroquad::prelude::*;
 mod config;
+mod game;
 mod input;
 mod level;
 mod objects;
@@ -33,7 +36,7 @@ async fn main() -> Result<()> {
 }
 
 async fn run(state: &mut State) -> Result<Option<Event>> {
-    match *state {
+    match state {
         State::Loading => {
             let resources_future = start_coroutine(async move {
                 let resources = resources::Resources::new().await.expect("Failed to load");
@@ -43,16 +46,32 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             while resources_future.is_done() == false {
                 clear_background(BLACK);
                 draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
-                next_frame().await
+                next_frame().await;
             }
             Ok(Some(Event::Loaded))
         }
-        State::Menu(_) => Ok(None),
+        State::Menu(_, menu) => {
+            loop {
+                // Update 
+                let input = input::update_input();
+                objects::update_objects(state, &input);
+                draw_text(&format!("menu {}", menu.selected.to_owned()), 30.0, 250.0, 30.0, WHITE);
+
+                // Draw
+                clear_background(BLACK);
+                draw_text("menu", 30.0, 200.0, 30.0, WHITE);
+                next_frame().await
+            }
+            Ok(None)
+        }
         State::Game(_) => loop {
-            clear_background(WHITE);
+            // Update 
             let input = input::update_input();
             objects::update_objects(state, &input);
             level::update_camera(&state);
+
+            // Draw
+            clear_background(WHITE);
             level::draw_level();
             objects::draw_objects(&state);
             next_frame().await

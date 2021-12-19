@@ -5,7 +5,7 @@ use macroquad::math::Vec2;
 pub enum State {
     Initial,
     Loading,
-    Menu(GameState),
+    Menu(GameState, MenuState),
     Game(GameState),
 }
 
@@ -13,26 +13,20 @@ pub enum State {
 pub enum Event {
     Initialized,
     Loaded,
+    Selected(String),
 }
 
 impl State {
     pub fn transition(self, event: Event) -> Self {
         match (&self, event) {
             (State::Initial, Event::Initialized) => State::Loading,
-            (State::Loading, Event::Loaded) => State::Game(GameState {
-                objects: GameObjectState {
-                    balls: vec![Ball::new()],
-                    actuators: [
-                        Actuator {
-                            pos: Vec2::new(0.0, SCREEN_H - 60.0),
-                        },
-                        Actuator {
-                            pos: Vec2::new(SCREEN_W - 60.0, SCREEN_H - 60.0),
-                        },
-                    ],
+            (State::Loading, Event::Loaded) => State::Menu(
+                GameState::new(),
+                MenuState {
+                    selected: 0,
+                    options: vec!["Start".to_string(), "Quit".to_string()],
                 },
-                camera: Vec2::new(0.0, 0.0),
-            }),
+            ),
             _ => self,
         }
     }
@@ -42,6 +36,31 @@ impl State {
 pub struct GameState {
     pub objects: GameObjectState,
     pub camera: Vec2,
+}
+
+impl GameState {
+    pub fn new() -> Self {
+        GameState {
+            objects: GameObjectState {
+                balls: vec![Ball::new()],
+                actuators: [
+                    Actuator {
+                        pos: Vec2::new(0.0, SCREEN_H - 60.0),
+                    },
+                    Actuator {
+                        pos: Vec2::new(SCREEN_W - 60.0, SCREEN_H - 60.0),
+                    },
+                ],
+            },
+            camera: Vec2::new(0.0, 0.0),
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct MenuState {
+    pub selected: usize,
+    pub options: Vec<String>,
 }
 
 #[derive(Debug, PartialEq)]

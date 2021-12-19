@@ -4,7 +4,7 @@ use macroquad::prelude::*;
 
 pub fn update_camera(state: &State) {
     match state {
-        State::Menu(ref game) | State::Game(ref game) => {
+        State::Menu(ref game, _) | State::Game(ref game) => {
             set_camera(&Camera2D::from_display_rect(Rect::new(
                 game.camera.x,
                 game.camera.y,
