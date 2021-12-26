@@ -12,7 +12,9 @@ pub fn update_game(game: &mut GameState, input: &Input) {
     // Actuators
     physics::update_actuators(&mut game.objects.actuators, input);
     // Balls
-    physics::update_balls(&mut game.objects.balls, &game.objects.actuators);
+    physics::update_rod_physics(&mut game.objects.balls, &game.objects.actuators);
+
+    physics::update_balls(&mut game.objects.balls);
 }
 
 pub fn draw_game(game: &GameState) {

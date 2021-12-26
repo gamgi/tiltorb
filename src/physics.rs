@@ -1,12 +1,17 @@
 use crate::{
     config,
     config::SCALE,
+    game::game::BALL_RADIUS,
     input::Input,
-    state::{Actuator, Ball},
+    state::{Actuator, Ball, GameState},
 };
-use macroquad::{math::Vec2, time::get_frame_time};
+use macroquad::{
+    input::{is_mouse_button_down, mouse_position, MouseButton},
+    math::{Vec2, Vec3},
+    prelude::*,
+    time::get_frame_time,
+};
 
-const GRAVITY: (f32, f32) = (0.0, 9.81); // m/s
 const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
@@ -26,7 +31,7 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     }
 }
 
-pub fn update_balls(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
+pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
     let dt = get_frame_time();
     for ball in balls.iter_mut() {
         if !ball.active {
@@ -39,15 +44,33 @@ pub fn update_balls(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
         if ball.pos.x < 0.0 || ball.pos.x > (config::SCREEN_W / SCALE) {
             // reset ball x
             ball.pos.x = ball.pos.x.clamp(0.0, config::SCREEN_W / SCALE);
-            // reflect ball velocity on x-axis
-            ball.vel.x *= -WALL_DAMPING;
+
+            let impulse = Vec3::new(-ball.vel.x * (1.0 + WALL_DAMPING), 0.0, 0.0); // * mass
+            ball.impulses.push(impulse);
         }
         if ball.pos.y >= max_y {
             // reset ball y
             ball.pos.y = max_y;
             // project ball velocity on seesaw
-            ball.vel = seesaw_unit_vec(actuators).dot(ball.vel) * seesaw_unit_vec(actuators);
+            let v_target = seesaw_unit_vec(actuators).dot(ball.vel) * seesaw_unit_vec(actuators);
+            let impulse = v_target - ball.vel; // * mass
+            ball.impulses.push(impulse);
         }
+    }
+}
+
+pub fn update_balls(balls: &mut Vec<Ball>) {
+    let dt = get_frame_time();
+    for ball in balls.iter_mut() {
+        if !ball.active {
+            continue;
+        }
+        let forces: Vec3 = ball.forces.iter().sum();
+        let impulses : Vec3 = ball.impulses.iter().sum();
+        ball.impulses.clear();
+
+        ball.vel += forces * dt + impulses;
+        ball.pos += ball.vel * dt;
     }
 }
 
@@ -65,8 +88,8 @@ fn seesaw_y(at_x: f32, actuators: &[Actuator; 2]) -> f32 {
     actuators[0].pos.y + delta_y * fraction_x
 }
 
-fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec2 {
+fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
     let delta_y = actuators[1].pos.y - actuators[0].pos.y;
     let delta_x = actuators[1].pos.x - actuators[0].pos.x;
-    Vec2::new(delta_x, delta_y).normalize()
+    Vec3::new(delta_x, delta_y, 0.0).normalize()
 }

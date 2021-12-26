@@ -1,5 +1,6 @@
 use crate::config::{SCALE, SCREEN_H, SCREEN_W};
-use macroquad::math::Vec2;
+use crate::game::game::BALL_RADIUS;
+use macroquad::math::{Vec2, Vec3};
 
 #[derive(Debug, PartialEq)]
 pub enum State {
@@ -17,6 +18,7 @@ pub enum Event {
     Selected(String),
 }
 
+pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, 0.0); // m/s
 impl State {
     pub fn transition(self, event: Event) -> Self {
         match (self, event) {
@@ -108,9 +110,11 @@ pub struct GameObjectState {
 
 #[derive(Debug, PartialEq)]
 pub struct Ball {
-    pub pos: Vec2,
-    pub vel: Vec2,
+    pub pos: Vec3,
+    pub vel: Vec3,
     pub active: bool,
+    pub forces: Vec<Vec3>,
+    pub impulses: Vec<Vec3>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -122,9 +126,11 @@ pub struct Actuator {
 impl Ball {
     pub fn new() -> Self {
         Ball {
-            pos: Vec2::new(0.0, 0.0),
-            vel: Vec2::new(0.0, 0.0),
+            pos: Vec3::new(0.0, 0.0, BALL_RADIUS),
+            vel: Vec3::new(0.0, 0.0, BALL_RADIUS),
             active: true,
+            forces: vec![Vec3::from(GRAVITY)],
+            impulses: vec![],
         }
     }
 }

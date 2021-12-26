@@ -2,16 +2,23 @@ use crate::{
     config,
     config::SCALE,
     game::game::BALL_RADIUS,
+    // physics::GRAVITY,
     resources::Resources,
     state::{Ball, GameState, Hole},
 };
 use macroquad::experimental::collections::storage;
+use macroquad::math::{Vec2, Vec3};
 use macroquad::prelude::*;
+
+enum BallState {
+    Inside,
+    InsideEdge,
+    OutsideEdge,
+    Outside,
+}
 
 pub fn update_level(game: &mut GameState) {
     update_camera(game);
-
-    update_balls(&mut game.objects.balls, &game.level.holes);
 }
 
 fn update_camera(game: &GameState) {
