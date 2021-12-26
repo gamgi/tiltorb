@@ -1,6 +1,7 @@
 use crate::{
     config,
     config::SCALE,
+    debug::DebugData,
     game::game::BALL_RADIUS,
     input::Input,
     state::{Actuator, Ball, GameState},
@@ -31,14 +32,29 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     }
 }
 
-pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
-    let dt = get_frame_time();
+pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> Vec<DebugData> {
+    let mut debug = vec![];
     for ball in balls.iter_mut() {
         if !ball.active {
             continue;
         }
-        ball.vel += dt * Vec2::from(GRAVITY);
-        ball.pos += dt * ball.vel;
+        if is_key_down(KeyCode::Q) {
+            // let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(BALL_RADIUS * 0.3);
+            let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(-BALL_RADIUS * 2.0);
+            ball.pos.x = pos.x;
+            ball.pos.y = pos.y;
+            ball.pos.z = pos.z;
+            ball.vel.x = 0.0;
+            ball.vel.y = 0.0;
+        } else if is_mouse_button_down(MouseButton::Left) {
+            let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(BALL_RADIUS);
+            ball.pos.x = pos.x;
+            ball.pos.y = pos.y;
+            ball.vel.x = 0.0;
+            ball.vel.y = 0.0;
+            ball.vel.z = 0.0;
+            ball.pos.z = BALL_RADIUS;
+        }
         let max_y = seesaw_y(ball.pos.x, actuators);
 
         if ball.pos.x < 0.0 || ball.pos.x > (config::SCREEN_W / SCALE) {
@@ -57,6 +73,7 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
             ball.impulses.push(impulse);
         }
     }
+    debug
 }
 
 pub fn update_balls(balls: &mut Vec<Ball>) {

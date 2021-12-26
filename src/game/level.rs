@@ -1,8 +1,8 @@
 use crate::{
     config,
     config::SCALE,
+    debug::DebugData,
     game::game::BALL_RADIUS,
-    // physics::GRAVITY,
     resources::Resources,
     state::{Ball, GameState, Hole},
 };
@@ -17,10 +17,10 @@ enum BallState {
     Outside,
 }
 
-pub fn update_level(game: &mut GameState) {
+pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
     update_camera(game);
 
-    update_hole_physics(&mut game.objects.balls, &game.level.holes);
+    update_hole_physics(&mut game.objects.balls, &game.level.holes)
 }
 
 fn update_camera(game: &GameState) {
@@ -32,7 +32,8 @@ fn update_camera(game: &GameState) {
     )));
 }
 
-fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
+fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
+    let mut debug = vec![];
     for ball in balls.iter_mut() {
         if !ball.active {
             continue;
@@ -58,6 +59,17 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
                 BallState::Outside
             };
 
+            debug.push(DebugData::circle(wall, 0.01, GREEN));
+            debug.push(DebugData::line(
+                Vec3::new(hole.pos.x - hole.radius, hole.pos.y, 0.0),
+                Vec3::new(hole.pos.x - hole.radius, hole.pos.y, -5.0),
+                WHITE,
+            ));
+            debug.push(DebugData::line(
+                Vec3::new(hole.pos.x + hole.radius, hole.pos.y, 0.0),
+                Vec3::new(hole.pos.x + hole.radius, hole.pos.y, -5.0),
+                WHITE,
+            ));
             // Determine normal vectors
             let unit_normal = (hole.pos - edge).extend(0.0).normalize();
             let wall_normal = (ball.pos - wall).normalize();
@@ -67,7 +79,7 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
             let sgn = unit_normal.dot(distance).signum();
             let intrusion: f32 = ball.pos.distance(wall) - BALL_RADIUS;
 
-            if (wall.distance(ball.pos) < BALL_RADIUS ) && sgn > 0.0 {
+            if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
                 ball.pos -= wall_normal * intrusion * sgn;
             }
 
@@ -79,17 +91,35 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
 
             match ball_state {
                 BallState::InsideEdge => {
+                    debug.push(DebugData::text("ball_state", "inside-edge".to_string()));
+                    let projection = Vec3::new(-wall_normal.y, wall_normal.x, unit_normal.z);
                     if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
                         // zero veocity along normal
                         let v_target = ball.vel - wall_normal.dot(ball.vel) * wall_normal;
                         let impulse = v_target - ball.vel;
                         ball.impulses.push(impulse);
                     }
+
+                    debug.push(DebugData::line(
+                        ball.pos,
+                        ball.pos + projection * 0.2,
+                        YELLOW,
+                    ));
                 }
-                _ => {}
+                BallState::OutsideEdge => {
+                    debug.push(DebugData::text("ball_state", "outside-edge".to_string()));
+                }
+                BallState::Inside => {
+                    debug.push(DebugData::text("ball_state", "inside".to_string()));
+                }
+                BallState::Outside => {
+                    debug.push(DebugData::text("ball_state", "outside".to_string()));
+                }
             }
+            debug.push(DebugData::line(wall, wall + wall_normal * 0.2, MAGENTA));
         }
     }
+    debug
 }
 
 pub fn draw_level(game: &GameState) {

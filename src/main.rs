@@ -4,6 +4,7 @@ use macroquad::experimental::{collections::storage, coroutines::start_coroutine}
 use macroquad::prelude::*;
 
 mod config;
+mod debug;
 mod game;
 mod input;
 mod physics;
@@ -76,11 +77,12 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
         State::Game(game) => loop {
             // Update
             let input = input::update_input();
-            game::game::update_game(game, &input);
+            let debug = game::game::update_game(game, &input);
 
             // Draw
             clear_background(WHITE);
             game::game::draw_game(&game);
+            debug::draw_debug(&debug);
             next_frame().await
         },
         _ => Ok(None),
