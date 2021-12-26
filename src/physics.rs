@@ -66,7 +66,7 @@ pub fn update_balls(balls: &mut Vec<Ball>) {
             continue;
         }
         let forces: Vec3 = ball.forces.iter().sum();
-        let impulses : Vec3 = ball.impulses.iter().sum();
+        let impulses: Vec3 = ball.impulses.iter().sum();
         ball.impulses.clear();
 
         ball.vel += forces * dt + impulses;
