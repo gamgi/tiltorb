@@ -21,12 +21,36 @@ pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
 }
 
 fn update_camera(game: &GameState) {
-    set_camera(&Camera2D::from_display_rect(Rect::new(
-        game.camera.x,
-        game.camera.y,
-        config::SCREEN_W,
-        config::SCREEN_H,
-    )));
+    // Create camera like Camera2D::from_distplay_rect
+    // but with rotation
+    set_camera(&from_display_rect_and_rotation(
+        Rect::new(
+            game.camera.x,
+            game.camera.y,
+            config::SCREEN_W,
+            config::SCREEN_H,
+        ),
+        game.camera.z,
+    ));
+}
+
+pub fn from_display_rect_and_rotation(rect: Rect, rotation: f32) -> Camera2D {
+    let diff = rect.w - rect.h;
+    let h = rect.h + diff * rotation.sin().abs();
+    let target = vec2(rect.x + rect.w / 2., rect.y + h / 2.);
+
+    Camera2D {
+        target,
+        // TODO fix zoom
+        zoom: vec2(
+            1. / rect.w * (1. + rotation.cos().abs()),
+            -1. / rect.h * (1. + rotation.cos().abs()),
+        ),
+        offset: vec2(0., 0.),
+        rotation: rotation / 3.14 * 180.0,
+        render_target: None,
+        viewport: None,
+    }
 }
 
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
