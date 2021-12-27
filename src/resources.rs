@@ -3,12 +3,18 @@ use macroquad::prelude::*;
 pub struct Resources {
     pub background: Texture2D,
     pub ball: Texture2D,
+    pub font: Font,
 }
 
 impl Resources {
     pub async fn new() -> Result<Self, FileError> {
         let background = load_texture("assets/testbg_small.png").await?;
         let ball = load_texture("assets/ball.png").await?;
-        Ok(Resources { background, ball })
+        let font = load_ttf_font("assets/Helltown-eg8p.ttf").await.unwrap();
+        Ok(Resources {
+            background,
+            ball,
+            font,
+        })
     }
 }
