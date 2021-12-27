@@ -116,6 +116,7 @@ pub struct Ball {
     pub active: bool,
     pub forces: Vec<Vec3>,
     pub impulses: Vec<Vec3>,
+    pub in_hole: bool,
 }
 
 #[derive(Debug, PartialEq)]
@@ -132,6 +133,7 @@ impl Ball {
             active: true,
             forces: vec![Vec3::from(GRAVITY)],
             impulses: vec![],
+            in_hole: false,
         }
     }
 }

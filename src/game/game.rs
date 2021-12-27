@@ -1,9 +1,9 @@
 use super::level;
+use crate::config::SCALE;
 use crate::debug::DebugData;
 use crate::input::Input;
 use crate::physics;
 use crate::state::GameState;
-use crate::config::SCALE;
 use macroquad::prelude::*;
 
 pub const BALL_RADIUS: f32 = 0.03;

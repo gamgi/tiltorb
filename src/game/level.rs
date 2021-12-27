@@ -32,20 +32,27 @@ fn update_camera(game: &GameState) {
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
     let mut debug = vec![];
     for ball in balls.iter_mut() {
+        ball.in_hole = false;
         if !ball.active {
             continue;
         }
-        for hole in holes {
+        for (i, hole) in holes.iter().enumerate() {
+            let is_last_hole = i == holes.len() - 1;
             // Determine nearest point on hole rim
             let edge: Vec2 = hole.pos + (ball.pos.truncate() - hole.pos).normalize() * hole.radius;
 
             // Find nearest point on wall
             let wall = if hole.pos.distance(ball.pos.truncate()) < hole.radius - BALL_RADIUS {
+                ball.in_hole = true;
                 edge.extend(f32::min(0.0, ball.pos.z))
             } else if hole.pos.distance(ball.pos.truncate()) < hole.radius {
+                ball.in_hole = true;
                 edge.extend(f32::min(0.0, ball.pos.z))
-            } else {
+            } else if is_last_hole && !ball.in_hole {
+                // use "background" as wall
                 ball.pos.truncate().extend(0.0)
+            } else {
+                continue;
             };
 
             debug.push(DebugData::circle(wall, 0.01, GREEN));
@@ -99,6 +106,8 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
             ));
             debug.push(DebugData::line(wall, wall + wall_normal * 0.2, MAGENTA));
         }
+
+        debug.push(DebugData::text("in hole", ball.in_hole.to_string()));
     }
     debug
 }
