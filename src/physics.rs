@@ -1,10 +1,9 @@
 use crate::{
-    config,
     config::SCALE,
     debug::DebugData,
     game::game::{BALL_RADIUS, ROD_RADIUS},
     input::Input,
-    state::{Actuator, Ball, GameState},
+    state::{Actuator, Ball},
 };
 use macroquad::{
     input::{is_mouse_button_down, mouse_position, MouseButton},
@@ -16,7 +15,6 @@ use macroquad::{
 const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
-const _BALL_MASS: f32 = 0.15; // kg
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     let dt = get_frame_time();

@@ -3,7 +3,7 @@ use crate::debug::DebugData;
 use crate::input::Input;
 use crate::physics;
 use crate::state::GameState;
-use crate::{config, config::SCALE};
+use crate::config::SCALE;
 use macroquad::prelude::*;
 
 pub const BALL_RADIUS: f32 = 0.03;
@@ -54,13 +54,4 @@ pub fn draw_game(game: &GameState) {
         ROD_RADIUS * 2.0 * SCALE,
         BLUE,
     );
-}
-
-fn update_camera(game: &GameState) {
-    set_camera(&Camera2D::from_display_rect(Rect::new(
-        game.camera.x,
-        game.camera.y,
-        config::SCREEN_W,
-        config::SCREEN_H,
-    )));
 }

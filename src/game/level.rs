@@ -11,13 +11,7 @@ use macroquad::math::{Vec2, Vec3};
 use macroquad::prelude::*;
 
 const WALL_DAMPING: f32 = 0.4;
-
-enum BallState {
-    Inside,
-    InsideEdge,
-    OutsideEdge,
-    Outside,
-}
+const _BALL_MASS: f32 = 0.15; // kg
 
 pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
     update_camera(game);
@@ -46,20 +40,12 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
             let edge: Vec2 = hole.pos + (ball.pos.truncate() - hole.pos).normalize() * hole.radius;
 
             // Find nearest point on wall
-            let wall: Vec3;
-            let ball_state = if (hole.pos.distance(ball.pos.truncate()) < hole.radius - BALL_RADIUS)
-            {
-                wall = edge.extend(f32::min(0.0, ball.pos.z));
-                BallState::Inside
-            } else if (hole.pos.distance(ball.pos.truncate()) < hole.radius) {
-                wall = edge.extend(f32::min(0.0, ball.pos.z));
-                BallState::InsideEdge
-            } else if (hole.pos.distance(ball.pos.truncate()) < hole.radius + BALL_RADIUS) {
-                wall = ball.pos.truncate().extend(0.0);
-                BallState::OutsideEdge
+            let wall = if hole.pos.distance(ball.pos.truncate()) < hole.radius - BALL_RADIUS {
+                edge.extend(f32::min(0.0, ball.pos.z))
+            } else if hole.pos.distance(ball.pos.truncate()) < hole.radius {
+                edge.extend(f32::min(0.0, ball.pos.z))
             } else {
-                wall = ball.pos.truncate().extend(0.0);
-                BallState::Outside
+                ball.pos.truncate().extend(0.0)
             };
 
             debug.push(DebugData::circle(wall, 0.01, GREEN));
@@ -104,15 +90,13 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
             ball.impulses.push(impulse);
 
             // Debug
-            if let BallState::InsideEdge = ball_state {
-                let projection = Vec3::new(-wall_normal.y, wall_normal.x, unit_normal.z);
+            let projection = Vec3::new(-wall_normal.y, wall_normal.x, unit_normal.z);
 
-                debug.push(DebugData::line(
-                    ball.pos,
-                    ball.pos + projection * 0.2,
-                    YELLOW,
-                ));
-            }
+            debug.push(DebugData::line(
+                ball.pos,
+                ball.pos + projection * 0.2,
+                YELLOW,
+            ));
             debug.push(DebugData::line(wall, wall + wall_normal * 0.2, MAGENTA));
         }
     }
@@ -126,7 +110,7 @@ fn update_edge_physics(balls: &mut Vec<Ball>) {
         }
         // X-axis
         let min_x = BALL_RADIUS;
-        let max_x = (config::SCREEN_W / SCALE - BALL_RADIUS);
+        let max_x = config::SCREEN_W / SCALE - BALL_RADIUS;
         if ball.pos.x < min_x || ball.pos.x > max_x {
             ball.pos.x = ball.pos.x.clamp(min_x, max_x);
             let impulse = Vec3::new(-ball.vel.x * (1.0 + WALL_DAMPING), 0.0, 0.0); // * mass

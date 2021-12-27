@@ -3,6 +3,7 @@ use crate::game::game::BALL_RADIUS;
 use macroquad::math::{Vec2, Vec3};
 
 #[derive(Debug, PartialEq)]
+#[allow(dead_code)]
 pub enum State {
     Initial,
     Loading,
