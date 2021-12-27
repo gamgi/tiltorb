@@ -2,7 +2,7 @@ use crate::{
     config,
     config::SCALE,
     debug::DebugData,
-    game::game::BALL_RADIUS,
+    game::game::{BALL_RADIUS, ROD_RADIUS},
     input::Input,
     state::{Actuator, Ball, GameState},
 };
@@ -38,24 +38,11 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
         if !ball.active {
             continue;
         }
-        if is_key_down(KeyCode::Q) {
-            // let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(BALL_RADIUS * 0.3);
-            let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(-BALL_RADIUS * 2.0);
-            ball.pos.x = pos.x;
-            ball.pos.y = pos.y;
-            ball.pos.z = pos.z;
-            ball.vel.x = 0.0;
-            ball.vel.y = 0.0;
-        } else if is_mouse_button_down(MouseButton::Left) {
-            let pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(BALL_RADIUS);
-            ball.pos.x = pos.x;
-            ball.pos.y = pos.y;
-            ball.vel.x = 0.0;
-            ball.vel.y = 0.0;
-            ball.vel.z = 0.0;
-            ball.pos.z = BALL_RADIUS;
+        if is_mouse_button_down(MouseButton::Left) {
+            ball.pos = (Vec2::from(mouse_position()) / SCALE * 2.0).extend(BALL_RADIUS);
+            ball.vel = Vec3::new(0.0, 0.0, 0.0);
         }
-        let max_y = seesaw_y(ball.pos.x, actuators);
+        debug.push(DebugData::circle(ball.pos, 0.03, BLUE));
 
         if ball.pos.x < 0.0 || ball.pos.x > (config::SCREEN_W / SCALE) {
             // reset ball x
@@ -64,14 +51,30 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
             let impulse = Vec3::new(-ball.vel.x * (1.0 + WALL_DAMPING), 0.0, 0.0); // * mass
             ball.impulses.push(impulse);
         }
-        if ball.pos.y >= max_y {
-            // reset ball y
-            ball.pos.y = max_y;
-            // project ball velocity on seesaw
-            let v_target = seesaw_unit_vec(actuators).dot(ball.vel) * seesaw_unit_vec(actuators);
-            let impulse = v_target - ball.vel; // * mass
-            ball.impulses.push(impulse);
+
+        // Determine nearest point on rod
+        let actuator = actuators[0].pos.extend(BALL_RADIUS * 1.01);
+        let rod = actuator
+            + seesaw_unit_vec(actuators) * (ball.pos - actuator).dot(seesaw_unit_vec(actuators));
+        // Determine normal vectors
+        let rod_normal = (ball.pos - rod).normalize();
+
+        // Solve collision by moving ball in normal direction
+        let distance: Vec3 = ball.pos - rod;
+        let sgn = Vec3::new(0.0, -1.0, 0.0).dot(distance).signum();
+        let intrusion: f32 = ball.pos.distance(rod) - (BALL_RADIUS + ROD_RADIUS);
+        if (rod.distance(ball.pos) < (BALL_RADIUS + ROD_RADIUS)) && sgn > 0.0 {
+            ball.pos -= rod_normal * intrusion * sgn;
+        } else {
+            continue;
         }
+
+        // Correct velocity
+        ball.impulses.push(-rod_normal.dot(ball.vel) * rod_normal);
+        // Debug
+        debug.push(DebugData::text("rod hit", "hit".to_string()));
+        debug.push(DebugData::line(rod, rod + rod_normal * 0.2, RED));
+        debug.push(DebugData::circle(rod, 0.01, RED));
     }
     debug
 }

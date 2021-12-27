@@ -90,42 +90,36 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
             let sgn = unit_normal.dot(distance).signum();
             let intrusion: f32 = ball.pos.distance(wall) - BALL_RADIUS;
 
-            if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
-                ball.pos -= wall_normal * intrusion * sgn;
-            }
-
             // Stop at back
             if ball.pos.z < -3.0 * BALL_RADIUS {
                 ball.pos.z = -3.0 * BALL_RADIUS;
-                ball.vel.z = 0.0;
+                // ball.vel.z = 0.0;
+                ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
+            } else if ball.pos.z > BALL_RADIUS {
+                ball.pos.z = BALL_RADIUS;
+                // ball.vel.z = 0.0;
+                ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
             }
 
-            match ball_state {
-                BallState::InsideEdge => {
-                    debug.push(DebugData::text("ball_state", "inside-edge".to_string()));
-                    let projection = Vec3::new(-wall_normal.y, wall_normal.x, unit_normal.z);
-                    if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
-                        // zero veocity along normal
-                        let v_target = ball.vel - wall_normal.dot(ball.vel) * wall_normal;
-                        let impulse = v_target - ball.vel;
-                        ball.impulses.push(impulse);
-                    }
+            if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
+                ball.pos -= wall_normal * intrusion * sgn;
+            } else {
+                continue;
+            }
 
-                    debug.push(DebugData::line(
-                        ball.pos,
-                        ball.pos + projection * 0.2,
-                        YELLOW,
-                    ));
-                }
-                BallState::OutsideEdge => {
-                    debug.push(DebugData::text("ball_state", "outside-edge".to_string()));
-                }
-                BallState::Inside => {
-                    debug.push(DebugData::text("ball_state", "inside".to_string()));
-                }
-                BallState::Outside => {
-                    debug.push(DebugData::text("ball_state", "outside".to_string()));
-                }
+            // Correct velocity
+            let impulse = -wall_normal.dot(ball.vel) * wall_normal;
+            ball.impulses.push(impulse);
+
+            // Debug
+            if let BallState::InsideEdge = ball_state {
+                let projection = Vec3::new(-wall_normal.y, wall_normal.x, unit_normal.z);
+
+                debug.push(DebugData::line(
+                    ball.pos,
+                    ball.pos + projection * 0.2,
+                    YELLOW,
+                ));
             }
             debug.push(DebugData::line(wall, wall + wall_normal * 0.2, MAGENTA));
         }

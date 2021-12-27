@@ -7,10 +7,10 @@ use crate::{config, config::SCALE};
 use macroquad::prelude::*;
 
 pub const BALL_RADIUS: f32 = 0.03;
+pub const ROD_RADIUS: f32 = 0.008;
 
 pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
     let mut debug = Vec::new();
-    debug.extend(level::update_level(game));
 
     physics::update_actuators(&mut game.objects.actuators, input);
 
@@ -18,6 +18,7 @@ pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
         &mut game.objects.balls,
         &game.objects.actuators,
     ));
+    debug.extend(level::update_level(game));
 
     physics::update_balls(&mut game.objects.balls);
     debug
@@ -50,7 +51,7 @@ pub fn draw_game(game: &GameState) {
         game.objects.actuators[0].pos.y * SCALE,
         game.objects.actuators[1].pos.x * SCALE,
         game.objects.actuators[1].pos.y * SCALE,
-        15.0,
+        ROD_RADIUS * 2.0 * SCALE,
         BLUE,
     );
 }
