@@ -18,6 +18,7 @@ const ACTUATOR_DAMPING: f32 = 8.0;
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     let dt = get_frame_time();
+    let actuator_y_mean = (actuators[0].pos.y + actuators[1].pos.y) / 2.0;
     for (actuator, actuator_input) in actuators.iter_mut().zip(input.actuators) {
         let target_vel = actuator_input * ACTUATOR_VEL;
         let delta_vel = target_vel - actuator.vel;
@@ -26,6 +27,11 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
         // where k and b are stiffness and damping constants
         actuator.vel += dt * (-ACTUATOR_STIFFNESS * delta_vel - actuator.vel * ACTUATOR_DAMPING);
         actuator.pos.y += dt * actuator.vel;
+        // Clamp distance
+        actuator.pos.y = actuator
+            .pos
+            .y
+            .clamp(actuator_y_mean - 0.2, actuator_y_mean + 0.2);
     }
 }
 
