@@ -61,15 +61,26 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
 
             debug.push(DebugData::circle(wall, 0.01, GREEN));
             debug.push(DebugData::line(
-                Vec3::new(hole.pos.x - hole.radius, hole.pos.y, 0.0),
-                Vec3::new(hole.pos.x - hole.radius, hole.pos.y, -5.0),
+                Vec3::new(hole.pos.x, 0.0, 0.0),
+                Vec3::new(hole.pos.x, hole.pos.y - hole.radius, 0.0),
                 WHITE,
             ));
             debug.push(DebugData::line(
-                Vec3::new(hole.pos.x + hole.radius, hole.pos.y, 0.0),
-                Vec3::new(hole.pos.x + hole.radius, hole.pos.y, -5.0),
+                Vec3::new(hole.pos.x, hole.pos.y + hole.radius, 0.0),
+                Vec3::new(hole.pos.x, 10.0, 0.0),
                 WHITE,
             ));
+            debug.push(DebugData::line(
+                Vec3::new(hole.pos.x, hole.pos.y - hole.radius, 0.0),
+                Vec3::new(hole.pos.x, hole.pos.y - hole.radius, -5.0),
+                WHITE,
+            ));
+            debug.push(DebugData::line(
+                Vec3::new(hole.pos.x, hole.pos.y + hole.radius, 0.0),
+                Vec3::new(hole.pos.x, hole.pos.y + hole.radius, -5.0),
+                WHITE,
+            ));
+
             // Determine normal vectors
             let unit_normal = (hole.pos - edge).extend(0.0).normalize();
             let wall_normal = (ball.pos - wall).normalize();

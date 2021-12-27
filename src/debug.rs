@@ -68,6 +68,32 @@ impl DebugData {
             _ => {}
         };
     }
+
+    pub fn draw_zy(&self) {
+        match self {
+            DebugData::DebugGlyph(glyph) => match glyph.kind {
+                GlyphKind::Circle => {
+                    draw_circle(
+                        glyph.args_vec[0].z * SCALE + 400.0,
+                        glyph.args_vec[0].y * SCALE,
+                        glyph.args_f32[0] * SCALE,
+                        glyph.color,
+                    );
+                }
+                GlyphKind::Line => {
+                    draw_line(
+                        glyph.args_vec[0].z * SCALE + 400.0,
+                        glyph.args_vec[0].y * SCALE,
+                        glyph.args_vec[1].z * SCALE + 400.0,
+                        glyph.args_vec[1].y * SCALE,
+                        10.0,
+                        glyph.color,
+                    );
+                }
+            },
+            _ => {}
+        };
+    }
 }
 
 pub fn draw_debug(debug: &Vec<DebugData>) {
@@ -76,13 +102,14 @@ pub fn draw_debug(debug: &Vec<DebugData>) {
         match item {
             DebugData::DebugGlyph(_) => {
                 item.draw_xy();
+                item.draw_zy();
             }
             DebugData::DebugText { key, value } => {
                 draw_text(
                     &format!("{}: {}", key, value),
                     0.0,
-                    15.0 + y as f32 * 30.0,
-                    30.0,
+                    21.0 + y as f32 * 42.0,
+                    42.0,
                     WHITE,
                 );
                 y += 1;
