@@ -17,7 +17,6 @@ const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
 const _BALL_MASS: f32 = 0.15; // kg
-const WALL_DAMPING: f32 = 0.4;
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     let dt = get_frame_time();
@@ -43,14 +42,6 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
             ball.vel = Vec3::new(0.0, 0.0, 0.0);
         }
         debug.push(DebugData::circle(ball.pos, 0.03, BLUE));
-
-        if ball.pos.x < 0.0 || ball.pos.x > (config::SCREEN_W / SCALE) {
-            // reset ball x
-            ball.pos.x = ball.pos.x.clamp(0.0, config::SCREEN_W / SCALE);
-
-            let impulse = Vec3::new(-ball.vel.x * (1.0 + WALL_DAMPING), 0.0, 0.0); // * mass
-            ball.impulses.push(impulse);
-        }
 
         // Determine nearest point on rod
         let actuator = actuators[0].pos.extend(BALL_RADIUS * 1.01);
@@ -98,7 +89,7 @@ pub fn update_balls(balls: &mut Vec<Ball>) {
 ///
 /// Graphically:
 /// actuator[0](x,y) --- (at_x, ?) --- actuator[1](x,y)
-fn seesaw_y(at_x: f32, actuators: &[Actuator; 2]) -> f32 {
+fn _seesaw_y(at_x: f32, actuators: &[Actuator; 2]) -> f32 {
     // TODO vectors
     let delta_y = actuators[1].pos.y - actuators[0].pos.y;
     let relative_x = at_x - actuators[0].pos.x;

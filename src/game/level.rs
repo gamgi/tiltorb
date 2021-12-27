@@ -10,6 +10,8 @@ use macroquad::experimental::collections::storage;
 use macroquad::math::{Vec2, Vec3};
 use macroquad::prelude::*;
 
+const WALL_DAMPING: f32 = 0.4;
+
 enum BallState {
     Inside,
     InsideEdge,
@@ -20,6 +22,7 @@ enum BallState {
 pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
     update_camera(game);
 
+    update_edge_physics(&mut game.objects.balls);
     update_hole_physics(&mut game.objects.balls, &game.level.holes)
 }
 
@@ -90,17 +93,6 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
             let sgn = unit_normal.dot(distance).signum();
             let intrusion: f32 = ball.pos.distance(wall) - BALL_RADIUS;
 
-            // Stop at back
-            if ball.pos.z < -3.0 * BALL_RADIUS {
-                ball.pos.z = -3.0 * BALL_RADIUS;
-                // ball.vel.z = 0.0;
-                ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
-            } else if ball.pos.z > BALL_RADIUS {
-                ball.pos.z = BALL_RADIUS;
-                // ball.vel.z = 0.0;
-                ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
-            }
-
             if (wall.distance(ball.pos) < BALL_RADIUS) && sgn > 0.0 {
                 ball.pos -= wall_normal * intrusion * sgn;
             } else {
@@ -125,6 +117,29 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
         }
     }
     debug
+}
+
+fn update_edge_physics(balls: &mut Vec<Ball>) {
+    for ball in balls.iter_mut() {
+        if !ball.active {
+            continue;
+        }
+        // X-axis
+        let min_x = BALL_RADIUS;
+        let max_x = (config::SCREEN_W / SCALE - BALL_RADIUS);
+        if ball.pos.x < min_x || ball.pos.x > max_x {
+            ball.pos.x = ball.pos.x.clamp(min_x, max_x);
+            let impulse = Vec3::new(-ball.vel.x * (1.0 + WALL_DAMPING), 0.0, 0.0); // * mass
+            ball.impulses.push(impulse);
+        }
+        // Z-axis
+        let min_z = -3.0 * BALL_RADIUS;
+        let max_z = BALL_RADIUS;
+        if ball.pos.z < min_z || ball.pos.z > max_z {
+            ball.pos.z = ball.pos.z.clamp(min_z, max_z);
+            ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
+        }
+    }
 }
 
 pub fn draw_level(game: &GameState) {
