@@ -48,7 +48,7 @@ impl State {
 #[derive(Debug, PartialEq)]
 pub struct GameState {
     pub objects: GameObjectState,
-    pub camera: Vec2,
+    pub camera: Vec3,
     pub level: GameLevelState,
 }
 
@@ -68,7 +68,7 @@ impl GameState {
                     },
                 ],
             },
-            camera: Vec2::new(0.0, 0.0),
+            camera: Vec3::new(0.0, 0.0, 0.0),
             level: GameLevelState {
                 holes: vec![
                     Hole {
