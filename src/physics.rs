@@ -15,6 +15,7 @@ use macroquad::{
 const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
+pub const ACTUATOR_Z: f32 = BALL_RADIUS * 1.2;
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     let dt = get_frame_time();
@@ -48,7 +49,7 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
         debug.push(DebugData::circle(ball.pos, 0.03, BLUE));
 
         // Determine nearest point on rod
-        let actuator = actuators[0].pos.extend(BALL_RADIUS * 1.01);
+        let actuator = actuators[0].pos.extend(ACTUATOR_Z);
         let rod = actuator
             + seesaw_unit_vec(actuators) * (ball.pos - actuator).dot(seesaw_unit_vec(actuators));
         // Determine normal vectors

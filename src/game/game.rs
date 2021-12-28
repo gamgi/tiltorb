@@ -8,6 +8,7 @@ use macroquad::prelude::*;
 
 pub const BALL_RADIUS: f32 = 0.03;
 pub const ROD_RADIUS: f32 = 0.008;
+const DARKGRAY_SHADOW: Color = Color::new(0.31, 0.31, 0.31, 0.8);
 
 pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
     let mut debug = Vec::new();
@@ -25,15 +26,30 @@ pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
 }
 
 pub fn draw_game(game: &GameState) {
-    level::draw_level(game);
+    level::draw_background(game);
+    draw_game_objects(game, true);
+    level::draw_holes(game);
+    draw_game_objects(game, false);
+}
+
+pub fn draw_game_objects(game: &GameState, shadow: bool) {
     // Balls
     for ref ball in game.objects.balls.iter() {
-        draw_circle(
-            ball.pos.x * SCALE,
-            ball.pos.y * SCALE,
-            BALL_RADIUS * SCALE,
-            BLUE,
-        );
+        if shadow {
+            draw_circle(
+                ball.pos.x * SCALE + f32::max(0., ball.pos.z * SCALE * 0.5),
+                ball.pos.y * SCALE + f32::max(0., ball.pos.z * SCALE * 0.1),
+                BALL_RADIUS * SCALE,
+                DARKGRAY_SHADOW,
+            );
+        } else {
+            draw_circle(
+                ball.pos.x * SCALE,
+                ball.pos.y * SCALE,
+                BALL_RADIUS * SCALE,
+                LIGHTGRAY,
+            );
+        }
     }
     // Actuators
     for ref actuator in game.objects.actuators.iter() {
@@ -46,12 +62,23 @@ pub fn draw_game(game: &GameState) {
         );
     }
     // Seesaw
-    draw_line(
-        game.objects.actuators[0].pos.x * SCALE,
-        game.objects.actuators[0].pos.y * SCALE,
-        game.objects.actuators[1].pos.x * SCALE,
-        game.objects.actuators[1].pos.y * SCALE,
-        ROD_RADIUS * 2.0 * SCALE,
-        BLUE,
-    );
+    if shadow {
+        draw_line(
+            game.objects.actuators[0].pos.x * SCALE + physics::ACTUATOR_Z * SCALE * 0.5,
+            game.objects.actuators[0].pos.y * SCALE + physics::ACTUATOR_Z * SCALE * 0.1,
+            game.objects.actuators[1].pos.x * SCALE + physics::ACTUATOR_Z * SCALE * 0.5,
+            game.objects.actuators[1].pos.y * SCALE + physics::ACTUATOR_Z * SCALE * 0.1,
+            ROD_RADIUS * 2.0 * SCALE,
+            DARKGRAY_SHADOW,
+        );
+    } else {
+        draw_line(
+            game.objects.actuators[0].pos.x * SCALE,
+            game.objects.actuators[0].pos.y * SCALE,
+            game.objects.actuators[1].pos.x * SCALE,
+            game.objects.actuators[1].pos.y * SCALE,
+            ROD_RADIUS * 2.0 * SCALE,
+            LIGHTGRAY,
+        );
+    }
 }

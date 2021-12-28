@@ -159,9 +159,22 @@ fn update_edge_physics(balls: &mut Vec<Ball>) {
     }
 }
 
-pub fn draw_level(game: &GameState) {
+pub fn draw_holes(game: &GameState) {
+    // Holes
+    for hole in &game.level.holes {
+        draw_circle(
+            hole.pos.x * SCALE,
+            hole.pos.y * SCALE,
+            hole.radius * SCALE,
+            BLACK,
+        );
+    }
+}
+
+pub fn draw_background(game: &GameState) {
     let resources = storage::get_mut::<Resources>();
-    let aspect = resources.background.width() / resources.background.height();
+    // let aspect = resources.background.height() / resources.background.width();
+    let aspect = config::SCREEN_W / resources.background.width();
     // Background
     draw_texture_ex(
         resources.background,
@@ -169,17 +182,12 @@ pub fn draw_level(game: &GameState) {
         0.0,
         WHITE,
         DrawTextureParams {
-            dest_size: Some(vec2(config::SCREEN_W, config::SCREEN_H / aspect)),
+            dest_size: Some(vec2(
+                config::SCREEN_W,
+                resources.background.height() * aspect,
+            )),
+            // dest_size: Some(vec2(config::SCREEN_W, config::SCREEN_H / aspect)),
             ..Default::default()
         },
     );
-    // Holes
-    for hole in &game.level.holes {
-        draw_circle(
-            hole.pos.x * SCALE,
-            hole.pos.y * SCALE,
-            hole.radius * SCALE,
-            RED,
-        );
-    }
 }
