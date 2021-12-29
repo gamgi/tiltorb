@@ -8,7 +8,7 @@ pub struct Resources {
 
 impl Resources {
     pub async fn new() -> Result<Self, FileError> {
-        let background = load_texture("assets/testbg_small.png").await?;
+        let background = load_texture("assets/level_1_bg_small_tex.png").await?;
         let ball = load_texture("assets/ball.png").await?;
         let font = load_ttf_font("assets/Helltown-eg8p.ttf").await.unwrap();
         Ok(Resources {

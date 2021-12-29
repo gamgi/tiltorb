@@ -20,37 +20,26 @@ pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
     update_hole_physics(&mut game.objects.balls, &game.level.holes)
 }
 
-fn update_camera(game: &GameState) {
-    // Create camera like Camera2D::from_distplay_rect
-    // but with rotation
-    set_camera(&from_display_rect_and_rotation(
-        Rect::new(
-            game.camera.x,
-            game.camera.y,
-            config::SCREEN_W,
-            config::SCREEN_H,
-        ),
-        game.camera.z,
-    ));
-}
-
-pub fn from_display_rect_and_rotation(rect: Rect, rotation: f32) -> Camera2D {
-    let diff = rect.w - rect.h;
-    let h = rect.h + diff * rotation.sin().abs();
-    let target = vec2(rect.x + rect.w / 2., rect.y + h / 2.);
-
-    Camera2D {
+fn update_camera(game: &mut GameState) {
+    let scale = (screen_width() / screen_height()) / (config::SCREEN_W / config::SCREEN_H);
+    // let scale = 1. / (screen_height() / screen_width()) / (config::SCREEN_H / config::SCREEN_W);
+    let (w, h) = if scale >= 1.0 {
+        (config::SCREEN_W * scale, config::SCREEN_H)
+        // (config::SCREEN_H * scale, config::SCREEN_W)
+    } else {
+        (config::SCREEN_W, config::SCREEN_H / scale)
+        // (config::SCREEN_H, config::SCREEN_W / scale)
+    };
+    let x_offset = (w - config::SCREEN_W) / 2.;
+    let target = vec2(w / 2. - x_offset, h / 2.);
+    set_camera(&Camera2D {
         target,
-        // TODO fix zoom
-        zoom: vec2(
-            1. / rect.w * (1. + rotation.cos().abs()),
-            -1. / rect.h * (1. + rotation.cos().abs()),
-        ),
+        zoom: vec2(1.0 / w * 2.0, -1.0 / h * 2.0),
         offset: vec2(0., 0.),
-        rotation: rotation / 3.14 * 180.0,
+        rotation: game.camera.rotation / 3.14 * 180.0,
         render_target: None,
         viewport: None,
-    }
+    });
 }
 
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
@@ -171,10 +160,8 @@ pub fn draw_holes(game: &GameState) {
     }
 }
 
-pub fn draw_background(game: &GameState) {
+pub fn draw_background(_game: &GameState) {
     let resources = storage::get_mut::<Resources>();
-    // let aspect = resources.background.height() / resources.background.width();
-    let aspect = config::SCREEN_W / resources.background.width();
     // Background
     draw_texture_ex(
         resources.background,
@@ -182,11 +169,7 @@ pub fn draw_background(game: &GameState) {
         0.0,
         WHITE,
         DrawTextureParams {
-            dest_size: Some(vec2(
-                config::SCREEN_W,
-                resources.background.height() * aspect,
-            )),
-            // dest_size: Some(vec2(config::SCREEN_W, config::SCREEN_H / aspect)),
+            dest_size: Some(vec2(1080., 1920.)),
             ..Default::default()
         },
     );

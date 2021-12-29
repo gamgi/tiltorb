@@ -48,7 +48,7 @@ impl State {
 #[derive(Debug, PartialEq)]
 pub struct GameState {
     pub objects: GameObjectState,
-    pub camera: Vec3,
+    pub camera: GameCameraState,
     pub level: GameLevelState,
 }
 
@@ -68,7 +68,11 @@ impl GameState {
                     },
                 ],
             },
-            camera: Vec3::new(0.0, 0.0, 0.0),
+            camera: GameCameraState {
+                pos: Vec2::new(0.0, 0.0),
+                vel: Vec2::new(0.0, 0.0),
+                rotation: 0.,
+            },
             level: GameLevelState {
                 holes: vec![
                     Hole {
@@ -141,6 +145,13 @@ impl Ball {
 #[derive(Debug, PartialEq)]
 pub struct GameLevelState {
     pub holes: Vec<Hole>,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct GameCameraState {
+    pub pos: Vec2,
+    pub vel: Vec2,
+    pub rotation: f32,
 }
 
 #[derive(Debug, PartialEq)]
