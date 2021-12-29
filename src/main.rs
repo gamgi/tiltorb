@@ -10,6 +10,7 @@ mod input;
 mod physics;
 mod resources;
 mod state;
+mod transition;
 use crate::{
     config::window_conf,
     state::{Event, State},
@@ -22,15 +23,14 @@ pub type Result<T> = ::std::result::Result<T, Box<dyn Error>>;
 async fn main() -> Result<()> {
     let mut state = State::Initial;
     let mut event = Some(Event::Initialized);
-    loop {
-        if let Some(ev) = event.take() {
-            state = state.transition(ev);
-            event = run(&mut state).await?;
-        } else if let State::Terminating = state {
+    while let Some(ev) = event.take() {
+        state = state.transition(ev);
+        if let State::Terminating = state {
             break;
-        } else {
-            next_frame().await
         }
+        run_with_transition(&mut state, true).await?;
+        event = run(&mut state).await?;
+        run_with_transition(&mut state, false).await?;
     }
     Ok::<(), _>(())
 }
@@ -55,26 +55,54 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             });
 
             while resources_future.is_done() == false {
-                clear_background(BLACK);
-                draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
+                update(state).await?;
                 next_frame().await;
             }
             Ok(Some(Event::Loaded))
         }
-        State::Menu(_, menu) => {
-            loop {
-                // Update
-                let input = input::update_input();
-                return_if_some!(game::menu::update_menu(menu, &input));
+        State::Menu(_, _) => loop {
+            return_if_some!(update(state).await?);
+            next_frame().await;
+        },
+        State::Game(_) => loop {
+            return_if_some!(update(state).await?);
+            next_frame().await
+        },
+        _ => Ok(None),
+    }
+}
 
-                // Draw
-                clear_background(BLACK);
-                game::menu::draw_menu(&menu);
-                next_frame().await
-            }
+async fn run_with_transition(state: &mut State, out: bool) -> Result<Option<Event>> {
+    let start = get_time();
+    let mut event = None;
+    let mut elapsed = 0.;
+    while elapsed < 1. {
+        event = update(state).await?.or(event);
+        elapsed = transition::elapsed(start);
+        transition::draw_transition(elapsed, out);
+        next_frame().await;
+    }
+    Ok(event)
+}
+
+async fn update(state: &mut State) -> Result<Option<Event>> {
+    match state {
+        State::Loading => {
+            clear_background(BLACK);
+            draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
             Ok(None)
         }
-        State::Game(game) => loop {
+        State::Menu(_, menu) => {
+            // Update
+            let input = input::update_input();
+            return_if_some!(game::menu::update_menu(menu, &input));
+
+            // Draw
+            clear_background(BLACK);
+            game::menu::draw_menu(&menu);
+            Ok(None)
+        }
+        State::Game(game) => {
             // Update
             let input = input::update_input();
             let debug = game::game::update_game(game, &input);

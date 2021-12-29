@@ -28,7 +28,7 @@ impl State {
                 "start" => {
                     return State::Game(game);
                 }
-                "exit" => State::Terminating,
+                "quit" => State::Terminating,
                 _ => unreachable!(),
             },
             (State::Loading, Event::Loaded) => {
