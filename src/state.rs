@@ -1,5 +1,5 @@
 use crate::config::{SCALE, SCREEN_H, SCREEN_W};
-use crate::game::game::BALL_RADIUS;
+use crate::game::balls::BALL_RADIUS;
 use macroquad::math::{Vec2, Vec3};
 
 #[derive(Debug, PartialEq)]

@@ -2,7 +2,7 @@ use crate::{
     config,
     config::SCALE,
     debug::DebugData,
-    game::game::BALL_RADIUS,
+    game::balls::BALL_RADIUS,
     resources::Resources,
     state::{Ball, GameState, Hole},
 };

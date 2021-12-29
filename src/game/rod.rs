@@ -1,7 +1,8 @@
 use crate::{
     config::SCALE,
     debug::DebugData,
-    game::game::{BALL_RADIUS, ROD_RADIUS},
+    game::balls::BALL_RADIUS,
+    game::game::DARKGRAY_SHADOW,
     input::Input,
     state::{Actuator, Ball},
 };
@@ -16,6 +17,7 @@ const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
 pub const ACTUATOR_Z: f32 = BALL_RADIUS * 1.2;
+pub const ROD_RADIUS: f32 = 0.008;
 
 pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     let dt = get_frame_time();
@@ -73,6 +75,39 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
         debug.push(DebugData::circle(rod, 0.01, RED));
     }
     debug
+}
+
+pub fn draw_rod(actuators: &[Actuator; 2], shadow: bool) {
+    // Actuators
+    for ref actuator in actuators.iter() {
+        draw_rectangle(
+            actuator.pos.x * SCALE,
+            actuator.pos.y * SCALE,
+            60.0,
+            60.0,
+            GREEN,
+        );
+    }
+    // Seesaw
+    if shadow {
+        draw_line(
+            actuators[0].pos.x * SCALE + ACTUATOR_Z * SCALE * 0.5,
+            actuators[0].pos.y * SCALE + ACTUATOR_Z * SCALE * 0.1,
+            actuators[1].pos.x * SCALE + ACTUATOR_Z * SCALE * 0.5,
+            actuators[1].pos.y * SCALE + ACTUATOR_Z * SCALE * 0.1,
+            ROD_RADIUS * 2.0 * SCALE,
+            DARKGRAY_SHADOW,
+        );
+    } else {
+        draw_line(
+            actuators[0].pos.x * SCALE,
+            actuators[0].pos.y * SCALE,
+            actuators[1].pos.x * SCALE,
+            actuators[1].pos.y * SCALE,
+            ROD_RADIUS * 2.0 * SCALE,
+            LIGHTGRAY,
+        );
+    }
 }
 
 fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
