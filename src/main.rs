@@ -7,7 +7,6 @@ mod config;
 mod debug;
 mod game;
 mod input;
-mod physics;
 mod resources;
 mod state;
 mod transition;

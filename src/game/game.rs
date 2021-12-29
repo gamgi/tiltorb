@@ -1,8 +1,9 @@
+use super::balls;
 use super::level;
+use super::rod;
 use crate::config::SCALE;
 use crate::debug::DebugData;
 use crate::input::Input;
-use crate::physics;
 use crate::state::GameState;
 use macroquad::prelude::*;
 
@@ -13,15 +14,15 @@ const DARKGRAY_SHADOW: Color = Color::new(0.31, 0.31, 0.31, 0.8);
 pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
     let mut debug = Vec::new();
 
-    physics::update_actuators(&mut game.objects.actuators, input);
+    rod::update_actuators(&mut game.objects.actuators, input);
 
-    debug.extend(physics::update_rod_physics(
+    debug.extend(rod::update_rod_physics(
         &mut game.objects.balls,
         &game.objects.actuators,
     ));
     debug.extend(level::update_level(game));
 
-    physics::update_balls(&mut game.objects.balls);
+    balls::update_balls(&mut game.objects.balls);
     debug
 }
 
@@ -64,10 +65,10 @@ pub fn draw_game_objects(game: &GameState, shadow: bool) {
     // Seesaw
     if shadow {
         draw_line(
-            game.objects.actuators[0].pos.x * SCALE + physics::ACTUATOR_Z * SCALE * 0.5,
-            game.objects.actuators[0].pos.y * SCALE + physics::ACTUATOR_Z * SCALE * 0.1,
-            game.objects.actuators[1].pos.x * SCALE + physics::ACTUATOR_Z * SCALE * 0.5,
-            game.objects.actuators[1].pos.y * SCALE + physics::ACTUATOR_Z * SCALE * 0.1,
+            game.objects.actuators[0].pos.x * SCALE + rod::ACTUATOR_Z * SCALE * 0.5,
+            game.objects.actuators[0].pos.y * SCALE + rod::ACTUATOR_Z * SCALE * 0.1,
+            game.objects.actuators[1].pos.x * SCALE + rod::ACTUATOR_Z * SCALE * 0.5,
+            game.objects.actuators[1].pos.y * SCALE + rod::ACTUATOR_Z * SCALE * 0.1,
             ROD_RADIUS * 2.0 * SCALE,
             DARKGRAY_SHADOW,
         );

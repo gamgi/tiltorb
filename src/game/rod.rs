@@ -75,35 +75,6 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
     debug
 }
 
-pub fn update_balls(balls: &mut Vec<Ball>) {
-    let dt = get_frame_time();
-    for ball in balls.iter_mut() {
-        if !ball.active {
-            continue;
-        }
-        let forces: Vec3 = ball.forces.iter().sum();
-        let impulses: Vec3 = ball.impulses.iter().sum();
-        ball.impulses.clear();
-
-        ball.vel += forces * dt + impulses;
-        ball.pos += ball.vel * dt;
-    }
-}
-
-/// Calculate seesaw y coordinate at x
-///
-/// Graphically:
-/// actuator[0](x,y) --- (at_x, ?) --- actuator[1](x,y)
-fn _seesaw_y(at_x: f32, actuators: &[Actuator; 2]) -> f32 {
-    // TODO vectors
-    let delta_y = actuators[1].pos.y - actuators[0].pos.y;
-    let relative_x = at_x - actuators[0].pos.x;
-    let delta_x = actuators[1].pos.x - actuators[0].pos.x;
-    let fraction_x = relative_x / delta_x;
-
-    actuators[0].pos.y + delta_y * fraction_x
-}
-
 fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
     let delta_y = actuators[1].pos.y - actuators[0].pos.y;
     let delta_x = actuators[1].pos.x - actuators[0].pos.x;
