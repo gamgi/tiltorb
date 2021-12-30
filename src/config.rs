@@ -6,7 +6,7 @@ pub const WINDOW_W: i32 = 540;
 pub const WINDOW_H: i32 = 960;
 pub const SCREEN_W: f32 = 1080.0;
 pub const SCREEN_H: f32 = 1920.0;
-const GAME_NAME: &str = "Tilt Orb";
+const GAME_NAME: &str = "Arcade Game";
 
 pub fn window_conf() -> Window {
     Window {

@@ -1,3 +1,7 @@
+# Arcade Game
+
+Precision arcade game made with Rust.
+
 # Acknowledgements
 
 I want to express my gratitude to
