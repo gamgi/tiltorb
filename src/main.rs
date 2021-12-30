@@ -91,9 +91,10 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
             Ok(None)
         }
-        State::Menu(_, menu) => {
+        State::Menu(game, menu) => {
             // Update
             let input = input::update_input();
+            game::game::update_camera(game);
             return_if_some!(game::menu::update_menu(menu, &input));
 
             // Draw

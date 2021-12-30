@@ -14,32 +14,8 @@ const WALL_DAMPING: f32 = 0.4;
 const _BALL_MASS: f32 = 0.15; // kg
 
 pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
-    update_camera(game);
-
     update_edge_physics(&mut game.objects.balls);
     update_hole_physics(&mut game.objects.balls, &game.level.holes)
-}
-
-fn update_camera(game: &mut GameState) {
-    let scale = (screen_width() / screen_height()) / (config::SCREEN_W / config::SCREEN_H);
-    // let scale = 1. / (screen_height() / screen_width()) / (config::SCREEN_H / config::SCREEN_W);
-    let (w, h) = if scale >= 1.0 {
-        (config::SCREEN_W * scale, config::SCREEN_H)
-        // (config::SCREEN_H * scale, config::SCREEN_W)
-    } else {
-        (config::SCREEN_W, config::SCREEN_H / scale)
-        // (config::SCREEN_H, config::SCREEN_W / scale)
-    };
-    let x_offset = (w - config::SCREEN_W) / 2.;
-    let target = vec2(w / 2. - x_offset, h / 2.);
-    set_camera(&Camera2D {
-        target,
-        zoom: vec2(1.0 / w * 2.0, -1.0 / h * 2.0),
-        offset: vec2(0., 0.),
-        rotation: game.camera.rotation / 3.14 * 180.0,
-        render_target: None,
-        viewport: None,
-    });
 }
 
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
