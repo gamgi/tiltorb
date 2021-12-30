@@ -7,7 +7,7 @@ use crate::input::Input;
 use crate::state::GameState;
 use macroquad::prelude::*;
 
-pub const DARKGRAY_SHADOW: Color = Color::new(0.31, 0.31, 0.31, 0.8);
+pub const DARKGRAY_SHADOW: Color = Color::new(0.1, 0.1, 0.1, 0.5);
 
 pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
     let mut debug = Vec::new();

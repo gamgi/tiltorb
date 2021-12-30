@@ -13,5 +13,5 @@ pub fn draw_transition(elapsed: f64, out: bool) {
 }
 
 pub fn elapsed(start_time: f64) -> f64 {
-    (get_time() - start_time) / DURATION
+    f64::min(1.0, (get_time() - start_time) / DURATION)
 }
