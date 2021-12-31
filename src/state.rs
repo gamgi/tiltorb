@@ -1,6 +1,9 @@
 use crate::config::{SCALE, SCREEN_H, SCREEN_W};
 use crate::game::balls::BALL_RADIUS;
 use macroquad::math::{Vec2, Vec3};
+use serde::Deserialize;
+use std::fs::File;
+use std::io::Read;
 
 #[derive(Debug, PartialEq)]
 #[allow(dead_code)]
@@ -77,30 +80,7 @@ impl GameState {
                 vel: Vec2::new(0.0, 0.0),
                 rotation: 0.,
             },
-            level: GameLevelState {
-                holes: vec![
-                    Hole {
-                        pos: Vec2::new(0.1, 0.1),
-                        radius: 0.04,
-                    },
-                    Hole {
-                        pos: Vec2::new(0.2, 0.1),
-                        radius: 0.04,
-                    },
-                    Hole {
-                        pos: Vec2::new(0.2, 0.8),
-                        radius: 0.05,
-                    },
-                    Hole {
-                        pos: Vec2::new(0.9, 0.8),
-                        radius: 0.05,
-                    },
-                    Hole {
-                        pos: Vec2::new(1.0, 0.9),
-                        radius: 0.04,
-                    },
-                ],
-            },
+            level: GameLevelState::from_file("assets/example_level.json"),
         }
     }
 }
@@ -159,9 +139,20 @@ impl Ball {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct GameLevelState {
     pub holes: Vec<Hole>,
+}
+
+impl GameLevelState {
+    pub fn from_file(file_name: &str) -> Self {
+        let mut file = File::open(file_name).unwrap();
+        let mut data = String::new();
+        file.read_to_string(&mut data).unwrap();
+
+        let level: GameLevelState = serde_json::from_str(&data).expect("Could not parse JSON");
+        level
+    }
 }
 
 #[derive(Debug, PartialEq)]
@@ -171,7 +162,7 @@ pub struct GameCameraState {
     pub rotation: f32,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Deserialize)]
 pub struct Hole {
     pub pos: Vec2,
     pub radius: f32,
