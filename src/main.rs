@@ -52,6 +52,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
                 let resources = resources::Resources::new().await.expect("Failed to load");
                 storage::store(resources);
             });
+            storage::store(Vec::<DebugData>::new());
 
             while resources_future.is_done() == false {
                 update(state).await?;

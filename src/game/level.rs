@@ -13,13 +13,13 @@ use macroquad::prelude::*;
 const WALL_DAMPING: f32 = 0.4;
 const _BALL_MASS: f32 = 0.15; // kg
 
-pub fn update_level(game: &mut GameState) -> Vec<DebugData> {
+pub fn update_level(game: &mut GameState) -> Option<Event> {
     update_edge_physics(&mut game.objects.balls);
     update_hole_physics(&mut game.objects.balls, &game.level.holes)
 }
 
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
-    let mut debug = vec![];
+    let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
         ball.in_hole = false;
         if !ball.active {

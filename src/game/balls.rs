@@ -3,7 +3,7 @@ use crate::{debug::DebugData, game::game::DARKGRAY_SHADOW, state::Ball};
 use macroquad::{math::Vec3, prelude::*, time::get_frame_time};
 pub const BALL_RADIUS: f32 = 0.03;
 
-pub fn update_balls(balls: &mut Vec<Ball>) -> Vec<DebugData> {
+pub fn update_balls(balls: &mut Vec<Ball>) {
     let dt = get_frame_time();
     for ball in balls.iter_mut() {
         if !ball.active {
@@ -16,10 +16,11 @@ pub fn update_balls(balls: &mut Vec<Ball>) -> Vec<DebugData> {
         ball.vel += forces * dt + impulses;
         ball.pos += ball.vel * dt;
     }
-    Vec::new()
 }
 
 pub fn draw_balls(balls: &Vec<Ball>, shadow: bool) {
+    // pub fn draw_balls(game: &GameState, shadow: bool) {
+    // Balls
     for ref ball in balls.iter() {
         if shadow {
             draw_circle(

@@ -1,5 +1,6 @@
 #![allow(dead_code)]
 use crate::config::SCALE;
+use macroquad::experimental::collections::storage;
 use macroquad::prelude::*;
 pub enum DebugData {
     DebugGlyph(DebugGlyph),
@@ -97,9 +98,10 @@ impl DebugData {
     }
 }
 
-pub fn draw_debug(debug: &Vec<DebugData>) {
+pub fn draw_debug() {
+    let mut debug = storage::get_mut::<Vec<DebugData>>();
     let mut y = 0;
-    for item in debug {
+    for item in debug.iter() {
         match item {
             DebugData::DebugGlyph(_) => {
                 item.draw_xy();
@@ -118,4 +120,5 @@ pub fn draw_debug(debug: &Vec<DebugData>) {
         }
         item.draw_xy();
     }
+    debug.clear();
 }

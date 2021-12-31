@@ -7,6 +7,7 @@ use crate::{
     state::{Actuator, Ball},
 };
 use macroquad::{
+    experimental::collections::storage,
     input::{is_mouse_button_down, mouse_position, MouseButton},
     math::{Vec2, Vec3},
     prelude::*,
@@ -39,7 +40,7 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
 }
 
 pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> Vec<DebugData> {
-    let mut debug = vec![];
+    let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
         if !ball.active {
             continue;
@@ -74,7 +75,6 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> V
         debug.push(DebugData::line(rod, rod + rod_normal * 0.2, RED));
         debug.push(DebugData::circle(rod, 0.01, RED));
     }
-    debug
 }
 
 pub fn draw_rod(actuators: &[Actuator; 2], shadow: bool) {
