@@ -15,10 +15,11 @@ const _BALL_MASS: f32 = 0.15; // kg
 
 pub fn update_level(game: &mut GameState) -> Option<Event> {
     update_edge_physics(&mut game.objects.balls);
-    update_hole_physics(&mut game.objects.balls, &game.level.holes)
+    update_hole_physics(&mut game.objects.balls, &game.level.holes);
+    update_state(&mut game.objects.balls)
 }
 
-fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Option<Event> {
+fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
     let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
         ball.in_hole = false;
@@ -98,7 +99,6 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Option<Event
 
         debug.push(DebugData::text("in hole", ball.in_hole.to_string()));
     }
-    None
 }
 
 fn update_edge_physics(balls: &mut Vec<Ball>) {
@@ -115,13 +115,23 @@ fn update_edge_physics(balls: &mut Vec<Ball>) {
             ball.impulses.push(impulse);
         }
         // Z-axis
-        let min_z = -3.0 * BALL_RADIUS;
-        let max_z = BALL_RADIUS;
-        if ball.pos.z < min_z || ball.pos.z > max_z {
-            ball.pos.z = ball.pos.z.clamp(min_z, max_z);
+        if ball.pos.z > BALL_RADIUS {
+            ball.pos.z = BALL_RADIUS;
             ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
         }
     }
+}
+
+fn update_state(balls: &mut Vec<Ball>) -> Option<Event> {
+    for ball in balls.iter_mut() {
+        if !ball.active {
+            continue;
+        }
+        if ball.in_hole && ball.pos.z < -2. * BALL_RADIUS {
+            return Some(Event::RoundLost);
+        }
+    }
+    None
 }
 
 pub fn draw_holes(game: &GameState) {

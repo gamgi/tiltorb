@@ -14,28 +14,30 @@ pub enum State {
 
 #[derive(Debug, PartialEq)]
 pub enum Event {
-    Initialized,
-    Loaded,
-    Selected(String),
-    Ended,
+    AppInitialized,
+    AppLoaded,
+    MenuSelected(String),
+    GameEnded,
+    RoundCompleted,
+    RoundLost,
 }
 
 pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, 0.0); // m/s
 impl State {
     pub fn transition(self, event: Event) -> Self {
         match (self, event) {
-            (State::Initial, Event::Initialized) => return State::Loading,
-            (State::Menu(game, _), Event::Selected(item)) => match item.as_str() {
+            (State::Initial, Event::AppInitialized) => return State::Loading,
+            (State::Loading, Event::AppLoaded) => {
+                return State::Menu(GameState::new(), MenuState::main());
+            }
+            (State::Menu(game, _), Event::MenuSelected(item)) => match item.as_str() {
                 "start" => {
                     return State::Game(game);
                 }
                 "quit" => State::Terminating,
                 _ => unreachable!(),
             },
-            (State::Loading, Event::Loaded) => {
-                return State::Menu(GameState::new(), MenuState::main());
-            }
-            (State::Game(_), Event::Ended) => {
+            (State::Game(_), Event::GameEnded) => {
                 return State::Menu(GameState::new(), MenuState::main());
             }
             (state, _) => state,

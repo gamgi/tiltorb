@@ -24,7 +24,7 @@ pub type Result<T> = ::std::result::Result<T, Box<dyn Error>>;
 #[macroquad::main(window_conf)]
 async fn main() -> Result<()> {
     let mut state = State::Initial;
-    let mut event = Some(Event::Initialized);
+    let mut event = Some(Event::AppInitialized);
     while let Some(ev) = event.take() {
         state = state.transition(ev);
         if let State::Terminating = state {
@@ -50,7 +50,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
                 update(state).await?;
                 next_frame().await;
             }
-            Ok(Some(Event::Loaded))
+            Ok(Some(Event::AppLoaded))
         }
         State::Menu(_, _) => loop {
             return_ok_if_some!(update(state).await?);
@@ -97,7 +97,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             // Update
             let input = input::update_input();
             if input.escape {
-                return Ok(Some(Event::Ended));
+                return Ok(Some(Event::GameEnded));
             }
             return_ok_if_some!(game::game::update_game(game, &input));
 
@@ -106,7 +106,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             game::game::draw_game(&game);
             debug::draw_debug();
         }
-        _ => {},
+        _ => {}
     }
     Ok(None)
 }

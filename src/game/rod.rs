@@ -4,7 +4,7 @@ use crate::{
     game::balls::BALL_RADIUS,
     game::game::DARKGRAY_SHADOW,
     input::Input,
-    state::{Actuator, Ball, Event},
+    state::{Actuator, Ball},
 };
 use macroquad::{
     experimental::collections::storage,

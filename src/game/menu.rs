@@ -18,7 +18,7 @@ pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
     }
 
     if input.enter {
-        return Some(Event::Selected(
+        return Some(Event::MenuSelected(
             menu.options
                 .get(menu.selected)
                 .unwrap()
