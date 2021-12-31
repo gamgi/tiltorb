@@ -10,9 +10,11 @@ mod input;
 mod resources;
 mod state;
 mod transition;
+mod utils;
 use crate::{
     config::window_conf,
     state::{Event, State},
+    utils::return_ok_if_some,
 };
 use std::error::Error;
 
@@ -34,17 +36,6 @@ async fn main() -> Result<()> {
     Ok::<(), _>(())
 }
 
-macro_rules! return_if_some {
-    ( $e:expr ) => {
-        match $e {
-            Some(v) => {
-                return Ok(Some(v));
-            }
-            None => {}
-        }
-    };
-}
-
 async fn run(state: &mut State) -> Result<Option<Event>> {
     match state {
         State::Loading => {
@@ -61,11 +52,11 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             Ok(Some(Event::Loaded))
         }
         State::Menu(_, _) => loop {
-            return_if_some!(update(state).await?);
+            return_ok_if_some!(update(state).await?);
             next_frame().await;
         },
         State::Game(_) => loop {
-            return_if_some!(update(state).await?);
+            return_ok_if_some!(update(state).await?);
             next_frame().await
         },
         _ => Ok(None),
@@ -96,7 +87,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             // Update
             let input = input::update_input();
             game::game::update_camera(game);
-            return_if_some!(game::menu::update_menu(menu, &input));
+            return_ok_if_some!(game::menu::update_menu(menu, &input));
 
             // Draw
             clear_background(BLACK);
