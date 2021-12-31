@@ -1,5 +1,5 @@
 use crate::config::SCALE;
-use crate::{debug::DebugData, game::game::DARKGRAY_SHADOW, state::Ball};
+use crate::{game::game::DARKGRAY_SHADOW, state::Ball};
 use macroquad::{math::Vec3, prelude::*, time::get_frame_time};
 pub const BALL_RADIUS: f32 = 0.03;
 

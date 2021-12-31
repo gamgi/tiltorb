@@ -11,8 +11,8 @@ macro_rules! return_ok_if_some {
 
 macro_rules! return_if_some {
     ( $e:expr ) => {
-        if let Some(_) = $e {
-            return $e;
+        if let Some(v) = $e {
+            return Some(v);
         }
     };
 }

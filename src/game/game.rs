@@ -41,7 +41,6 @@ pub fn update_camera(game: &GameState) {
     });
 }
 
-
 pub fn draw_game(game: &GameState) {
     level::draw_background(game);
     balls::draw_balls(&game.objects.balls, true);

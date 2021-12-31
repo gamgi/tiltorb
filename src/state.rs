@@ -40,6 +40,10 @@ impl State {
             (State::Game(_), Event::GameEnded) => {
                 return State::Menu(GameState::new(), MenuState::main());
             }
+            (State::Game(_), Event::RoundLost) => {
+                println!("really lost");
+                return State::Game(GameState::new());
+            }
             (state, _) => state,
         }
     }
@@ -141,7 +145,11 @@ pub struct Actuator {
 impl Ball {
     pub fn new() -> Self {
         Ball {
-            pos: Vec3::new(0.0, 0.0, BALL_RADIUS),
+            pos: Vec3::new(
+                SCREEN_W * 0.5 / SCALE,
+                (SCREEN_H - 120.) / SCALE,
+                BALL_RADIUS,
+            ),
             vel: Vec3::new(0.0, 0.0, BALL_RADIUS),
             active: true,
             forces: vec![Vec3::from(GRAVITY)],

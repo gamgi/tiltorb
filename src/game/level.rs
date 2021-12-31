@@ -115,8 +115,10 @@ fn update_edge_physics(balls: &mut Vec<Ball>) {
             ball.impulses.push(impulse);
         }
         // Z-axis
-        if ball.pos.z > BALL_RADIUS {
-            ball.pos.z = BALL_RADIUS;
+        let min_z = -3.0 * BALL_RADIUS;
+        let max_z = BALL_RADIUS;
+        if ball.pos.z < min_z || ball.pos.z > max_z {
+            ball.pos.z = ball.pos.z.clamp(min_z, max_z);
             ball.impulses.push(Vec3::new(0.0, 0.0, -ball.vel.z));
         }
     }
@@ -128,6 +130,7 @@ fn update_state(balls: &mut Vec<Ball>) -> Option<Event> {
             continue;
         }
         if ball.in_hole && ball.pos.z < -2. * BALL_RADIUS {
+            ball.active = false;
             return Some(Event::RoundLost);
         }
     }
