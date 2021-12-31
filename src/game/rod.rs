@@ -4,7 +4,7 @@ use crate::{
     game::balls::BALL_RADIUS,
     game::game::DARKGRAY_SHADOW,
     input::Input,
-    state::{Actuator, Ball},
+    state::{Actuator, Ball, Event},
 };
 use macroquad::{
     experimental::collections::storage,
@@ -39,7 +39,7 @@ pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
     }
 }
 
-pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) -> Vec<DebugData> {
+pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
     let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
         if !ball.active {

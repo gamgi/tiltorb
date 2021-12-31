@@ -1,26 +1,24 @@
 use super::balls;
 use super::level;
 use super::rod;
-use crate::config::{SCREEN_W,SCREEN_H};
-use crate::debug::DebugData;
-use crate::input::Input;
-use crate::state::GameState;
+use crate::{
+    config::{SCREEN_H, SCREEN_W},
+    input::Input,
+    state::{Event, GameState},
+    utils::return_if_some,
+};
 use macroquad::prelude::*;
 
 pub const DARKGRAY_SHADOW: Color = Color::new(0.1, 0.1, 0.1, 0.5);
 
-pub fn update_game(game: &mut GameState, input: &Input) -> Vec<DebugData> {
-    let mut debug = Vec::new();
+pub fn update_game(game: &mut GameState, input: &Input) -> Option<Event> {
     update_camera(game);
 
     rod::update_actuators(&mut game.objects.actuators, input);
-    debug.extend(rod::update_rod_physics(
-        &mut game.objects.balls,
-        &game.objects.actuators,
-    ));
-    debug.extend(level::update_level(game));
-    debug.extend(balls::update_balls(&mut game.objects.balls));
-    debug
+    rod::update_rod_physics(&mut game.objects.balls, &game.objects.actuators);
+    return_if_some!(level::update_level(game));
+    balls::update_balls(&mut game.objects.balls);
+    None
 }
 
 pub fn update_camera(game: &GameState) {

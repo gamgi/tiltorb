@@ -4,7 +4,7 @@ use crate::{
     debug::DebugData,
     game::balls::BALL_RADIUS,
     resources::Resources,
-    state::{Ball, GameState, Hole},
+    state::{Ball, Event, GameState, Hole},
 };
 use macroquad::experimental::collections::storage;
 use macroquad::math::{Vec2, Vec3};
@@ -18,7 +18,7 @@ pub fn update_level(game: &mut GameState) -> Option<Event> {
     update_hole_physics(&mut game.objects.balls, &game.level.holes)
 }
 
-fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugData> {
+fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Option<Event> {
     let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
         ball.in_hole = false;
@@ -98,7 +98,7 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) -> Vec<DebugDat
 
         debug.push(DebugData::text("in hole", ball.in_hole.to_string()));
     }
-    debug
+    None
 }
 
 fn update_edge_physics(balls: &mut Vec<Ball>) {

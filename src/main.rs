@@ -13,6 +13,7 @@ mod transition;
 mod utils;
 use crate::{
     config::window_conf,
+    debug::DebugData,
     state::{Event, State},
     utils::return_ok_if_some,
 };
@@ -81,7 +82,6 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
         State::Loading => {
             clear_background(BLACK);
             draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
-            Ok(None)
         }
         State::Menu(game, menu) => {
             // Update
@@ -92,19 +92,21 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             // Draw
             clear_background(BLACK);
             game::menu::draw_menu(&menu);
-            Ok(None)
         }
         State::Game(game) => {
             // Update
             let input = input::update_input();
-            let debug = game::game::update_game(game, &input);
+            if input.escape {
+                return Ok(Some(Event::Ended));
+            }
+            return_ok_if_some!(game::game::update_game(game, &input));
 
             // Draw
-            clear_background(WHITE);
+            clear_background(YELLOW);
             game::game::draw_game(&game);
-            debug::draw_debug(&debug);
-            next_frame().await
-        },
-        _ => Ok(None),
+            debug::draw_debug();
+        }
+        _ => {},
     }
+    Ok(None)
 }

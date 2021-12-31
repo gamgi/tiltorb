@@ -17,6 +17,7 @@ pub enum Event {
     Initialized,
     Loaded,
     Selected(String),
+    Ended,
 }
 
 pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, 0.0); // m/s
@@ -32,13 +33,10 @@ impl State {
                 _ => unreachable!(),
             },
             (State::Loading, Event::Loaded) => {
-                return State::Menu(
-                    GameState::new(),
-                    MenuState {
-                        selected: 0,
-                        options: vec!["Start".to_string(), "Quit".to_string()],
-                    },
-                )
+                return State::Menu(GameState::new(), MenuState::main());
+            }
+            (State::Game(_), Event::Ended) => {
+                return State::Menu(GameState::new(), MenuState::main());
             }
             (state, _) => state,
         }
@@ -105,6 +103,15 @@ impl GameState {
 pub struct MenuState {
     pub selected: usize,
     pub options: Vec<String>,
+}
+
+impl MenuState {
+    pub fn main() -> Self {
+        MenuState {
+            selected: 0,
+            options: vec!["Start".to_string(), "Quit".to_string()],
+        }
+    }
 }
 
 #[derive(Debug, PartialEq)]

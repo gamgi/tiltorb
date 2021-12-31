@@ -5,6 +5,7 @@ pub struct Input {
     pub menu_up: bool,
     pub menu_down: bool,
     pub enter: bool,
+    pub escape: bool,
 }
 
 fn read_updown(up: KeyCode, down: KeyCode) -> f32 {
@@ -20,5 +21,6 @@ pub fn update_input() -> Input {
         menu_up: is_key_pressed(KeyCode::Up),
         menu_down: is_key_pressed(KeyCode::Down),
         enter: is_key_pressed(KeyCode::Enter),
+        escape: is_key_pressed(KeyCode::Escape),
     }
 }

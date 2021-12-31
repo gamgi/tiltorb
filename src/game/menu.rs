@@ -1,6 +1,6 @@
 use crate::{
-    input::Input,
     config::SCREEN_H,
+    input::Input,
     resources::Resources,
     state::{Event, MenuState},
 };
