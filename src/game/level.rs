@@ -138,7 +138,6 @@ fn update_state(balls: &mut Vec<Ball>) -> Option<Event> {
 }
 
 pub fn draw_holes(game: &GameState) {
-    // Holes
     for hole in &game.level.holes {
         draw_circle(
             hole.pos.x * SCALE,
@@ -149,11 +148,13 @@ pub fn draw_holes(game: &GameState) {
     }
 }
 
-pub fn draw_background(_game: &GameState) {
+pub fn draw_background(game: &GameState) {
     let resources = storage::get_mut::<Resources>();
-    // Background
     draw_texture_ex(
-        resources.background,
+        *resources
+            .backgrounds
+            .get(&game.level.background_image)
+            .expect("Resource for background_image not found"),
         0.0,
         0.0,
         WHITE,

@@ -80,7 +80,7 @@ impl GameState {
                 vel: Vec2::new(0.0, 0.0),
                 rotation: 0.,
             },
-            level: GameLevelState::from_file("assets/example_level.json"),
+            level: GameLevelState::from_file("assets/level_example.json"),
         }
     }
 }
@@ -142,6 +142,7 @@ impl Ball {
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct GameLevelState {
     pub holes: Vec<Hole>,
+    pub background_image: String,
 }
 
 impl GameLevelState {
