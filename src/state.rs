@@ -4,7 +4,7 @@ use crate::{
     resources::Asset,
 };
 use macroquad::math::{Vec2, Vec3};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq)]
 #[allow(dead_code)]
@@ -13,6 +13,7 @@ pub enum State {
     Loading,
     Menu(GameState, MenuState),
     Game(GameState),
+    Editor(GameState, EditorState),
     Terminating,
 }
 
@@ -24,6 +25,7 @@ pub enum Event {
     GameEnded,
     RoundCompleted,
     RoundLost,
+    EditorClosed,
 }
 
 pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, 0.0); // m/s
@@ -34,18 +36,25 @@ impl State {
             (State::Loading, Event::AppLoaded) => {
                 return State::Menu(GameState::new(), MenuState::main());
             }
-            (State::Menu(game, _), Event::MenuSelected(item)) => match item.as_str() {
+            (State::Menu(_, _), Event::MenuSelected(item)) => match item.as_str() {
                 "start" => {
-                    return State::Game(game);
+                    return State::Game(GameState::load("level_example.json"));
                 }
                 "quit" => State::Terminating,
+                "editor" => State::Editor(
+                    GameState::load("level_new.json"),
+                    EditorState { radius: 0.04 },
+                ),
                 _ => unreachable!(),
             },
             (State::Game(_), Event::GameEnded) => {
-                return State::Menu(GameState::new(), MenuState::main());
+                return State::Menu(GameState::load("level_example.json"), MenuState::main());
             }
-            (State::Game(_), Event::RoundLost) => {
-                return State::Game(GameState::new());
+            (State::Game(game), Event::RoundLost) => {
+                return State::Game(game.reset());
+            }
+            (State::Editor(game, _), Event::EditorClosed) => {
+                return State::Game(game.reset());
             }
             (state, _) => state,
         }
@@ -61,6 +70,37 @@ pub struct GameState {
 
 impl GameState {
     pub fn new() -> Self {
+        GameState {
+            level: GameLevelState::new(),
+            ..Default::default()
+        }
+    }
+
+    pub fn load(level_file: &str) -> Self {
+        GameState {
+            level: GameLevelState::from_file(level_file),
+            ..Default::default()
+        }
+    }
+
+    pub fn reset(mut self) -> Self {
+        self.objects.actuators = [
+            Actuator {
+                pos: Vec2::new(0.0, (SCREEN_H - 60.0) / SCALE),
+                vel: 0.0,
+            },
+            Actuator {
+                pos: Vec2::new((SCREEN_W - 60.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                vel: 0.0,
+            },
+        ];
+        self.objects.balls = vec![Ball::new()];
+        self
+    }
+}
+
+impl Default for GameState {
+    fn default() -> Self {
         GameState {
             objects: GameObjectState {
                 balls: vec![Ball::new()],
@@ -80,7 +120,7 @@ impl GameState {
                 vel: Vec2::new(0.0, 0.0),
                 rotation: 0.,
             },
-            level: GameLevelState::from_file("level_example.json"),
+            level: GameLevelState::new(),
         }
     }
 }
@@ -95,7 +135,11 @@ impl MenuState {
     pub fn main() -> Self {
         MenuState {
             selected: 0,
-            options: vec!["Start".to_string(), "Quit".to_string()],
+            options: vec![
+                "Start".to_string(),
+                // "Editor".to_string(),
+                "Quit".to_string(),
+            ],
         }
     }
 }
@@ -139,20 +183,33 @@ impl Ball {
     }
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct GameLevelState {
     pub holes: Vec<Hole>,
     pub background_image: String,
+    #[serde(skip)]
+    pub level_file: String,
 }
 
 impl GameLevelState {
-    pub fn from_file(file_name: &str) -> Self {
-        let data = Asset::get(file_name)
-            .expect(&format!("Could not load level \"{}\"", file_name))
-            .data;
+    pub fn new() -> Self {
+        GameLevelState {
+            holes: Vec::new(),
+            background_image: "level_example.png".to_string(),
+            level_file: "level_new.json".to_string(),
+        }
+    }
 
-        let level: GameLevelState = serde_json::from_slice(&data).expect("Could not parse JSON");
-        level
+    pub fn from_file(level_file: &str) -> Self {
+        let data = Asset::get(level_file)
+            .expect(&format!("Could not load level \"{}\"", level_file))
+            .data;
+        let data = serde_json::from_slice(&data).expect("Could not parse JSON");
+
+        GameLevelState {
+            level_file: level_file.to_string(),
+            ..data
+        }
     }
 }
 
@@ -163,8 +220,13 @@ pub struct GameCameraState {
     pub rotation: f32,
 }
 
-#[derive(Debug, PartialEq, Deserialize)]
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Hole {
     pub pos: Vec2,
+    pub radius: f32,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct EditorState {
     pub radius: f32,
 }

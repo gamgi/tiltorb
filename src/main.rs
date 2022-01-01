@@ -5,6 +5,7 @@ use macroquad::prelude::*;
 
 mod config;
 mod debug;
+mod editor;
 mod game;
 mod input;
 mod resources;
@@ -52,11 +53,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             }
             Ok(Some(Event::AppLoaded))
         }
-        State::Menu(_, _) => loop {
-            return_ok_if_some!(update(state).await?);
-            next_frame().await;
-        },
-        State::Game(_) => loop {
+        State::Menu(_, _) | State::Game(_) | State::Editor(_, _) => loop {
             return_ok_if_some!(update(state).await?);
             next_frame().await
         },
@@ -102,9 +99,18 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
             return_ok_if_some!(game::game::update_game(game, &input));
 
             // Draw
-            clear_background(YELLOW);
+            clear_background(WHITE);
             game::game::draw_game(&game);
-            debug::draw_debug();
+            // debug::draw_debug();
+        }
+        State::Editor(game, editor) => {
+            // Update
+            game::game::update_camera(game);
+            return_ok_if_some!(editor::update_editor(game, editor));
+
+            // Draw
+            clear_background(WHITE);
+            editor::draw_editor(&game, &editor);
         }
         _ => {}
     }
