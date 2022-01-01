@@ -1,9 +1,10 @@
-use crate::config::{SCALE, SCREEN_H, SCREEN_W};
-use crate::game::balls::BALL_RADIUS;
+use crate::{
+    config::{SCALE, SCREEN_H, SCREEN_W},
+    game::balls::BALL_RADIUS,
+    resources::Asset,
+};
 use macroquad::math::{Vec2, Vec3};
 use serde::Deserialize;
-use std::fs::File;
-use std::io::Read;
 
 #[derive(Debug, PartialEq)]
 #[allow(dead_code)]
@@ -44,7 +45,6 @@ impl State {
                 return State::Menu(GameState::new(), MenuState::main());
             }
             (State::Game(_), Event::RoundLost) => {
-                println!("really lost");
                 return State::Game(GameState::new());
             }
             (state, _) => state,
@@ -80,7 +80,7 @@ impl GameState {
                 vel: Vec2::new(0.0, 0.0),
                 rotation: 0.,
             },
-            level: GameLevelState::from_file("assets/level_example.json"),
+            level: GameLevelState::from_file("level_example.json"),
         }
     }
 }
@@ -147,11 +147,11 @@ pub struct GameLevelState {
 
 impl GameLevelState {
     pub fn from_file(file_name: &str) -> Self {
-        let mut file = File::open(file_name).unwrap();
-        let mut data = String::new();
-        file.read_to_string(&mut data).unwrap();
+        let data = Asset::get(file_name)
+            .expect(&format!("Could not load level \"{}\"", file_name))
+            .data;
 
-        let level: GameLevelState = serde_json::from_str(&data).expect("Could not parse JSON");
+        let level: GameLevelState = serde_json::from_slice(&data).expect("Could not parse JSON");
         level
     }
 }
