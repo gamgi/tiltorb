@@ -8,7 +8,7 @@ use macroquad::{
     experimental::collections::storage, prelude::*, text::measure_text, time::get_time,
 };
 
-const FONT_SIZE:f32 = 96.;
+const FONT_SIZE: f32 = 96.;
 
 pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
     if input.menu_up {
@@ -37,9 +37,17 @@ pub fn draw_menu(menu: &MenuState) {
         let font_size = FONT_SIZE + scale * ((menu.selected == i) as i32 as f32);
         let text_params = get_text_params(&resources, font_size);
         if menu.selected == i {
-            draw_centered_text(text, y_start + FONT_SIZE + i as f32 * FONT_SIZE, text_params);
+            draw_centered_text(
+                text,
+                y_start + FONT_SIZE + i as f32 * FONT_SIZE,
+                text_params,
+            );
         } else {
-            draw_centered_text(text, y_start + FONT_SIZE + i as f32 * FONT_SIZE, text_params);
+            draw_centered_text(
+                text,
+                y_start + FONT_SIZE + i as f32 * FONT_SIZE,
+                text_params,
+            );
         }
     }
 }
@@ -52,10 +60,5 @@ fn get_text_params(resources: &Resources, font_size: f32) -> TextParams {
 }
 fn draw_centered_text(text: &str, y: f32, text_params: TextParams) {
     let text_size = measure_text(text, None, text_params.font_size as u16, 1.0);
-    draw_text_ex(
-        text,
-        screen_width() - text_size.width / 2.0,
-        y,
-        text_params,
-    );
+    draw_text_ex(text, screen_width() - text_size.width / 2.0, y, text_params);
 }
