@@ -28,7 +28,7 @@ pub enum Event {
     EditorClosed,
 }
 
-pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, 0.0); // m/s
+pub const GRAVITY: (f32, f32, f32) = (0.0, 9.81, -0.1); // m/s
 impl State {
     pub fn transition(self, event: Event) -> Self {
         match (self, event) {
