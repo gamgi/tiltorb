@@ -79,10 +79,8 @@ async fn run_with_transition(state: &mut State, out: bool) -> Result<Option<Even
 }
 
 async fn update(state: &mut State) -> Result<Option<Event>> {
-    let dt = get_frame_time();
-    let substeps = u32::max(1, (dt / TARGET_DELTATIME).ceil() as u32);
-    let dt = dt / substeps as f32;
-    for _ in 0..substeps {
+    let (frames, dt) = calculate_frames(state);
+    for _ in 0..frames {
         let input = input::update_input();
         match state {
             State::Menu(game, menu) => {
@@ -103,6 +101,18 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
         }
     }
     Ok(None)
+}
+
+fn calculate_frames(state: &State) -> (i32, f32) {
+    let dt = get_frame_time();
+    match state {
+        State::Game(_) => {
+            // divide frame into substeps to improve physics collision handling
+            let substeps = i32::max(1, (dt / TARGET_DELTATIME).ceil() as i32);
+            (substeps, dt / substeps as f32)
+        }
+        _ => (1, dt),
+    }
 }
 
 fn draw(state: &State) {
