@@ -116,12 +116,12 @@ fn draw(state: &State) {
             game::menu::draw_menu(&menu);
         }
         State::Game(game) => {
-            clear_background(WHITE);
+            clear_background(BLACK);
             game::game::draw_game(&game);
-            debug::draw_debug();
+            // debug::draw_debug();
         }
         State::Editor(game, editor) => {
-            clear_background(WHITE);
+            clear_background(BLACK);
             editor::draw_editor(&game, &editor);
         }
         _ => {}

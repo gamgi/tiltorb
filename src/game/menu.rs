@@ -1,5 +1,5 @@
 use crate::{
-    config::SCREEN_H,
+    config::{SCREEN_W,SCREEN_H},
     input::Input,
     resources::Resources,
     state::{Event, MenuState},
@@ -51,6 +51,7 @@ pub fn draw_menu(menu: &MenuState) {
         }
     }
 }
+
 fn get_text_params(resources: &Resources, font_size: f32) -> TextParams {
     TextParams {
         font_size: font_size as u16,
@@ -58,7 +59,8 @@ fn get_text_params(resources: &Resources, font_size: f32) -> TextParams {
         ..Default::default()
     }
 }
+
 fn draw_centered_text(text: &str, y: f32, text_params: TextParams) {
     let text_size = measure_text(text, None, text_params.font_size as u16, 1.0);
-    draw_text_ex(text, screen_width() - text_size.width / 2.0, y, text_params);
+    draw_text_ex(text, SCREEN_W / 2. - text_size.width / 2.0, y, text_params);
 }
