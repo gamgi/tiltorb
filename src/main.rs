@@ -21,6 +21,7 @@ use crate::{
 use std::error::Error;
 
 pub type Result<T> = ::std::result::Result<T, Box<dyn Error>>;
+const TARGET_DELTATIME: f32 = 0.008;
 
 #[macroquad::main(window_conf)]
 async fn main() -> Result<()> {
@@ -49,12 +50,14 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
 
             while resources_future.is_done() == false {
                 update(state).await?;
+                draw(state);
                 next_frame().await;
             }
             Ok(Some(Event::AppLoaded))
         }
         State::Menu(_, _) | State::Game(_) | State::Editor(_, _) => loop {
             return_ok_if_some!(update(state).await?);
+            draw(state);
             next_frame().await
         },
         _ => Ok(None),
@@ -68,6 +71,7 @@ async fn run_with_transition(state: &mut State, out: bool) -> Result<Option<Even
     while elapsed < 1. {
         event = update(state).await?.or(event);
         elapsed = transition::elapsed(start);
+        draw(state);
         transition::draw_transition(elapsed, out);
         next_frame().await;
     }
@@ -75,44 +79,51 @@ async fn run_with_transition(state: &mut State, out: bool) -> Result<Option<Even
 }
 
 async fn update(state: &mut State) -> Result<Option<Event>> {
+    let dt = get_frame_time();
+    let substeps = u32::max(1, (dt / TARGET_DELTATIME).ceil() as u32);
+    let dt = dt / substeps as f32;
+    for _ in 0..substeps {
+        let input = input::update_input();
+        match state {
+            State::Menu(game, menu) => {
+                game::game::update_camera(game);
+                return_ok_if_some!(game::menu::update_menu(menu, &input));
+            }
+            State::Game(game) => {
+                if input.escape {
+                    return Ok(Some(Event::GameEnded));
+                }
+                return_ok_if_some!(game::game::update_game(game, &input, dt));
+            }
+            State::Editor(game, editor) => {
+                game::game::update_camera(game);
+                return_ok_if_some!(editor::update_editor(game, editor));
+            }
+            _ => {}
+        }
+    }
+    Ok(None)
+}
+
+fn draw(state: &State) {
     match state {
         State::Loading => {
             clear_background(BLACK);
             draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
         }
-        State::Menu(game, menu) => {
-            // Update
-            let input = input::update_input();
-            game::game::update_camera(game);
-            return_ok_if_some!(game::menu::update_menu(menu, &input));
-
-            // Draw
+        State::Menu(_, menu) => {
             clear_background(BLACK);
             game::menu::draw_menu(&menu);
         }
         State::Game(game) => {
-            // Update
-            let input = input::update_input();
-            if input.escape {
-                return Ok(Some(Event::GameEnded));
-            }
-            return_ok_if_some!(game::game::update_game(game, &input));
-
-            // Draw
             clear_background(WHITE);
             game::game::draw_game(&game);
-            // debug::draw_debug();
+            debug::draw_debug();
         }
         State::Editor(game, editor) => {
-            // Update
-            game::game::update_camera(game);
-            return_ok_if_some!(editor::update_editor(game, editor));
-
-            // Draw
             clear_background(WHITE);
             editor::draw_editor(&game, &editor);
         }
         _ => {}
     }
-    Ok(None)
 }

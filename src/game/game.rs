@@ -11,13 +11,13 @@ use macroquad::prelude::*;
 
 pub const DARKGRAY_SHADOW: Color = Color::new(0.1, 0.1, 0.1, 0.5);
 
-pub fn update_game(game: &mut GameState, input: &Input) -> Option<Event> {
+pub fn update_game(game: &mut GameState, input: &Input, dt: f32) -> Option<Event> {
     update_camera(game);
 
-    rod::update_actuators(&mut game.objects.actuators, input);
+    rod::update_actuators(&mut game.objects.actuators, input, dt);
     rod::update_rod_physics(&mut game.objects.balls, &game.objects.actuators);
     return_if_some!(level::update_level(game));
-    balls::update_balls(&mut game.objects.balls);
+    balls::update_balls(&mut game.objects.balls, dt);
     None
 }
 

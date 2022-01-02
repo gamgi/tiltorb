@@ -11,7 +11,6 @@ use macroquad::{
     input::{is_mouse_button_down, mouse_position, MouseButton},
     math::{Vec2, Vec3},
     prelude::*,
-    time::get_frame_time,
 };
 
 const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
@@ -20,8 +19,7 @@ const ACTUATOR_DAMPING: f32 = 8.0;
 pub const ACTUATOR_Z: f32 = BALL_RADIUS * 1.2;
 pub const ROD_RADIUS: f32 = 0.008;
 
-pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input) {
-    let dt = get_frame_time();
+pub fn update_actuators(actuators: &mut [Actuator; 2], input: &Input, dt: f32) {
     let actuator_y_mean = (actuators[0].pos.y + actuators[1].pos.y) / 2.0;
     for (actuator, actuator_input) in actuators.iter_mut().zip(input.actuators) {
         let target_vel = actuator_input * ACTUATOR_VEL;

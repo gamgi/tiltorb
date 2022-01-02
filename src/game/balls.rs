@@ -1,10 +1,9 @@
 use crate::config::SCALE;
 use crate::{game::game::DARKGRAY_SHADOW, state::Ball};
-use macroquad::{math::Vec3, prelude::*, time::get_frame_time};
+use macroquad::{math::Vec3, prelude::*};
 pub const BALL_RADIUS: f32 = 0.03;
 
-pub fn update_balls(balls: &mut Vec<Ball>) {
-    let dt = get_frame_time();
+pub fn update_balls(balls: &mut Vec<Ball>, dt: f32) {
     for ball in balls.iter_mut() {
         if !ball.active {
             continue;
