@@ -4,7 +4,7 @@ use crate::{
     debug::DebugData,
     game::balls::BALL_RADIUS,
     resources::Resources,
-    state::{Ball, Event, GameState, Hole},
+    state::{Ball, Event, GameProgressState, GameState, Hole},
 };
 use macroquad::experimental::collections::storage;
 use macroquad::math::{Vec2, Vec3};
@@ -16,13 +16,13 @@ const _BALL_MASS: f32 = 0.15; // kg
 pub fn update_level(game: &mut GameState) -> Option<Event> {
     update_edge_physics(&mut game.objects.balls);
     update_hole_physics(&mut game.objects.balls, &game.level.holes);
-    update_state(&mut game.objects.balls)
+    update_state(game)
 }
 
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
     let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
-        ball.in_hole = false;
+        ball.in_hole = None;
         if !ball.active {
             continue;
         }
@@ -33,12 +33,12 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
 
             // Find nearest point on wall
             let wall = if hole.pos.distance(ball.pos.truncate()) < hole.radius - BALL_RADIUS {
-                ball.in_hole = true;
+                ball.in_hole = Some(i);
                 edge.extend(f32::min(0.0, ball.pos.z))
             } else if hole.pos.distance(ball.pos.truncate()) < hole.radius {
-                ball.in_hole = true;
+                ball.in_hole = Some(i);
                 edge.extend(f32::min(0.0, ball.pos.z))
-            } else if is_last_hole && !ball.in_hole {
+            } else if is_last_hole && ball.in_hole.is_none() {
                 // use "background" as wall
                 ball.pos.truncate().extend(0.0)
             } else {
@@ -97,7 +97,7 @@ fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
             debug.push(DebugData::line(wall, wall + wall_normal * 0.2, MAGENTA));
         }
 
-        debug.push(DebugData::text("in hole", ball.in_hole.to_string()));
+        debug.push(DebugData::text("in hole", format!("{:?}", ball.in_hole)));
     }
 }
 
@@ -124,26 +124,35 @@ fn update_edge_physics(balls: &mut Vec<Ball>) {
     }
 }
 
-fn update_state(balls: &mut Vec<Ball>) -> Option<Event> {
-    for ball in balls.iter_mut() {
+fn update_state(game: &mut GameState) -> Option<Event> {
+    for ball in game.objects.balls.iter_mut() {
         if !ball.active {
             continue;
         }
-        if ball.in_hole && ball.pos.z < -2. * BALL_RADIUS {
-            ball.active = false;
-            return Some(Event::RoundLost);
+        if ball.pos.z < -2. * BALL_RADIUS {
+            if let Some(current_hole) = ball.in_hole {
+                if game.get_goal_hole() == current_hole {
+                    return Some(Event::RoundCompleted);
+                } else {
+                    return Some(Event::RoundLost);
+                }
+            }
         }
     }
     None
 }
 
 pub fn draw_holes(game: &GameState) {
-    for hole in &game.level.holes {
+    for (i, hole) in game.level.holes.iter().enumerate() {
+        let color = match game.get_goal_hole() == i {
+            true => YELLOW,
+            false => BLACK,
+        };
         draw_circle(
             hole.pos.x * SCALE,
             hole.pos.y * SCALE,
             hole.radius * SCALE,
-            BLACK,
+            color,
         );
     }
 }

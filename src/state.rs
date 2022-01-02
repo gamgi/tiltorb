@@ -51,10 +51,13 @@ impl State {
                 return State::Menu(GameState::load("level_example.json"), MenuState::main());
             }
             (State::Game(game), Event::RoundLost) => {
-                return State::Game(game.reset());
+                return State::Game(game.reset_round());
+            }
+            (State::Game(game), Event::RoundCompleted) => {
+                return State::Game(game.next_round());
             }
             (State::Editor(game, _), Event::EditorClosed) => {
-                return State::Game(game.reset());
+                return State::Game(game.reset_round());
             }
             (state, _) => state,
         }
@@ -66,6 +69,7 @@ pub struct GameState {
     pub objects: GameObjectState,
     pub camera: GameCameraState,
     pub level: GameLevelState,
+    pub progress: GameProgressState,
 }
 
 impl GameState {
@@ -83,7 +87,7 @@ impl GameState {
         }
     }
 
-    pub fn reset(mut self) -> Self {
+    pub fn reset_round(mut self) -> Self {
         self.objects.actuators = [
             Actuator {
                 pos: Vec2::new(0.0, (SCREEN_H - 60.0) / SCALE),
@@ -97,11 +101,21 @@ impl GameState {
         self.objects.balls = vec![Ball::new()];
         self
     }
+
+    pub fn next_round(mut self) -> Self {
+        self.progress.goal_index += 1;
+        self.reset_round()
+    }
+
+    pub fn get_goal_hole(&self) -> usize {
+        *self.level.goals.get(self.progress.goal_index).unwrap_or(&0)
+    }
 }
 
 impl Default for GameState {
     fn default() -> Self {
         GameState {
+            progress: GameProgressState { goal_index: 0 },
             objects: GameObjectState {
                 balls: vec![Ball::new()],
                 actuators: [
@@ -157,7 +171,7 @@ pub struct Ball {
     pub active: bool,
     pub forces: Vec<Vec3>,
     pub impulses: Vec<Vec3>,
-    pub in_hole: bool,
+    pub in_hole: Option<usize>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -178,15 +192,16 @@ impl Ball {
             active: true,
             forces: vec![Vec3::from(GRAVITY)],
             impulses: vec![],
-            in_hole: false,
+            in_hole: None,
         }
     }
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct GameLevelState {
-    pub holes: Vec<Hole>,
     pub background_image: String,
+    pub goals: Vec<usize>,
+    pub holes: Vec<Hole>,
     #[serde(skip)]
     pub level_file: String,
 }
@@ -194,8 +209,9 @@ pub struct GameLevelState {
 impl GameLevelState {
     pub fn new() -> Self {
         GameLevelState {
-            holes: Vec::new(),
             background_image: "level_example.png".to_string(),
+            goals: Vec::new(),
+            holes: Vec::new(),
             level_file: "level_new.json".to_string(),
         }
     }
@@ -218,6 +234,11 @@ pub struct GameCameraState {
     pub pos: Vec2,
     pub vel: Vec2,
     pub rotation: f32,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct GameProgressState {
+    pub goal_index: usize,
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

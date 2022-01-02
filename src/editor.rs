@@ -1,4 +1,3 @@
-use std::fs::File;
 use crate::{
     config::SCALE,
     game::{level, rod},
@@ -6,6 +5,7 @@ use crate::{
     Result,
 };
 use macroquad::prelude::*;
+use std::fs::File;
 
 pub fn update_editor(game: &mut GameState, editor: &mut EditorState) -> Option<Event> {
     editor.radius = ((editor.radius + mouse_wheel().1 * 6.).clamp(8., 100.) / 2.).round() * 2.;
