@@ -15,6 +15,7 @@ mod utils;
 use crate::{
     config::window_conf,
     debug::DebugData,
+    resources::Resources,
     state::{Event, State},
     utils::return_ok_if_some,
 };
@@ -41,6 +42,14 @@ async fn main() -> Result<()> {
 
 async fn run(state: &mut State) -> Result<Option<Event>> {
     match state {
+        State::Splash => {
+            let start = get_time();
+            while get_time() - start < 1. {
+                draw(state);
+                next_frame().await;
+            }
+            Ok(Some(Event::SplashTimeout))
+        }
         State::Loading => {
             let resources_future = start_coroutine(async move {
                 let resources = resources::Resources::new().await.expect("Failed to load");
@@ -120,6 +129,16 @@ fn draw(state: &State) {
         State::Loading => {
             clear_background(BLACK);
             draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
+        }
+        State::Splash => {
+            clear_background(BLACK);
+            let resources = storage::get_mut::<Resources>();
+            draw_texture(
+                resources.splash,
+                (screen_width() - resources.splash.width()) / 2.,
+                (screen_height() - resources.splash.height()) / 2.,
+                WHITE,
+            );
         }
         State::Menu(_, menu) => {
             clear_background(BLACK);

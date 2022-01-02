@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 #[allow(dead_code)]
 pub enum State {
     Initial,
+    Splash,
     Loading,
     Menu(GameState, MenuState),
     Game(GameState),
@@ -21,6 +22,7 @@ pub enum State {
 pub enum Event {
     AppInitialized,
     AppLoaded,
+    SplashTimeout,
     MenuSelected(String),
     GameEnded,
     RoundCompleted,
@@ -33,7 +35,8 @@ impl State {
     pub fn transition(self, event: Event) -> Self {
         match (self, event) {
             (State::Initial, Event::AppInitialized) => return State::Loading,
-            (State::Loading, Event::AppLoaded) => {
+            (State::Loading, Event::AppLoaded) => return State::Splash,
+            (State::Splash, Event::SplashTimeout) => {
                 return State::Menu(GameState::new(), MenuState::main());
             }
             (State::Menu(_, _), Event::MenuSelected(item)) => match item.as_str() {
