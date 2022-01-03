@@ -55,7 +55,7 @@ pub fn draw_menu(menu: &MenuState) {
 fn get_text_params(resources: &Resources, font_size: f32) -> TextParams {
     TextParams {
         font_size: font_size as u16,
-        font: resources.font,
+        font: resources.font_menu,
         ..Default::default()
     }
 }

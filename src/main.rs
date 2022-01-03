@@ -5,6 +5,7 @@ use macroquad::prelude::*;
 
 mod config;
 mod debug;
+mod display;
 mod editor;
 mod game;
 mod input;
@@ -64,7 +65,7 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             }
             Ok(Some(Event::AppLoaded))
         }
-        State::Menu(_, _) | State::Game(_) | State::Editor(_, _) => loop {
+        State::Menu(_, _) | State::Game(_, _) | State::Editor(_, _) => loop {
             return_ok_if_some!(update(state).await?);
             draw(state);
             next_frame().await
@@ -96,10 +97,11 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
                 game::game::update_camera(game);
                 return_ok_if_some!(game::menu::update_menu(menu, &input));
             }
-            State::Game(game) => {
+            State::Game(game, display) => {
                 if input.escape {
                     return Ok(Some(Event::GameEnded));
                 }
+                display::update_display(display);
                 return_ok_if_some!(game::game::update_game(game, &input, dt));
             }
             State::Editor(game, editor) => {
@@ -115,7 +117,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
 fn calculate_frames(state: &State) -> (i32, f32) {
     let dt = get_frame_time();
     match state {
-        State::Game(_) => {
+        State::Game(_,_) => {
             // divide frame into substeps to improve physics collision handling
             let substeps = i32::max(1, (dt / TARGET_DELTATIME).ceil() as i32);
             (substeps, dt / substeps as f32)
@@ -144,10 +146,11 @@ fn draw(state: &State) {
             clear_background(BLACK);
             game::menu::draw_menu(&menu);
         }
-        State::Game(game) => {
+        State::Game(game, display) => {
             clear_background(BLACK);
             game::game::draw_game(&game);
-            // debug::draw_debug();
+            debug::draw_debug();
+            display::draw_display(&game, &display);
         }
         State::Editor(game, editor) => {
             clear_background(BLACK);

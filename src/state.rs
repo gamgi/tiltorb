@@ -3,7 +3,10 @@ use crate::{
     game::balls::BALL_RADIUS,
     resources::Asset,
 };
-use macroquad::math::{Vec2, Vec3};
+use macroquad::{
+    math::{Vec2, Vec3},
+    time::get_time,
+};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, PartialEq)]
@@ -13,7 +16,7 @@ pub enum State {
     Splash,
     Loading,
     Menu(GameState, MenuState),
-    Game(GameState),
+    Game(GameState, DisplayState),
     Editor(GameState, EditorState),
     Terminating,
 }
@@ -41,7 +44,7 @@ impl State {
             }
             (State::Menu(_, _), Event::MenuSelected(item)) => match item.as_str() {
                 "start" => {
-                    return State::Game(GameState::load("level_example.json"));
+                    return State::Game(GameState::load("level_example.json"), DisplayState::new());
                 }
                 "quit" => State::Terminating,
                 "editor" => State::Editor(
@@ -50,17 +53,17 @@ impl State {
                 ),
                 _ => unreachable!(),
             },
-            (State::Game(_), Event::GameEnded) => {
+            (State::Game(_, _), Event::GameEnded) => {
                 return State::Menu(GameState::load("level_example.json"), MenuState::main());
             }
-            (State::Game(game), Event::RoundLost) => {
-                return State::Game(game.reset_round());
+            (State::Game(game, _), Event::RoundLost) => {
+                return State::Game(game.reset_round(), DisplayState::message("oops"));
             }
-            (State::Game(game), Event::RoundCompleted) => {
-                return State::Game(game.next_round());
+            (State::Game(game, _), Event::RoundCompleted) => {
+                return State::Game(game.next_round(), DisplayState::message("great"));
             }
             (State::Editor(game, _), Event::EditorClosed) => {
-                return State::Game(game.reset_round());
+                return State::Game(game.reset_round(), DisplayState::new());
             }
             (state, _) => state,
         }
@@ -102,11 +105,13 @@ impl GameState {
             },
         ];
         self.objects.balls = vec![Ball::new()];
+        self.progress.start_time = get_time() + 1.;
         self
     }
 
     pub fn next_round(mut self) -> Self {
         self.progress.goal_index += 1;
+        self.progress.score += self.progress.time() as u16;
         self.reset_round()
     }
 
@@ -118,7 +123,11 @@ impl GameState {
 impl Default for GameState {
     fn default() -> Self {
         GameState {
-            progress: GameProgressState { goal_index: 0 },
+            progress: GameProgressState {
+                start_time: get_time() + 1.,
+                goal_index: 0,
+                score: 0,
+            },
             objects: GameObjectState {
                 balls: vec![Ball::new()],
                 actuators: [
@@ -242,6 +251,35 @@ pub struct GameCameraState {
 #[derive(Debug, PartialEq)]
 pub struct GameProgressState {
     pub goal_index: usize,
+    pub start_time: f64,
+    pub score: u16,
+}
+
+#[derive(Debug, PartialEq)]
+pub struct DisplayState {
+    pub message: Option<String>,
+    pub start_time: f64,
+}
+
+impl DisplayState {
+    pub fn new() -> Self {
+        DisplayState {
+            message: None,
+            start_time: 0.,
+        }
+    }
+    pub fn message(message: &str) -> Self {
+        DisplayState {
+            message: Some(message.to_string()),
+            start_time: get_time(),
+        }
+    }
+}
+
+impl GameProgressState {
+    pub fn time(&self) -> f64 {
+        99. - f64::max(0., get_time() - self.start_time).round()
+    }
 }
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]

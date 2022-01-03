@@ -9,22 +9,28 @@ pub struct Asset;
 
 pub struct Resources {
     pub backgrounds: HashMap<String, Texture2D>,
-    pub font: Font,
     pub splash: Texture2D,
+    pub font_menu: Font,
+    pub font_score: Font,
 }
 
 impl Resources {
     pub async fn new() -> Result<Self> {
-        let font_data = Asset::get("Helltown-eg8p.ttf").ok_or("Could not load font")?;
-        let font = load_ttf_font_from_bytes(&font_data.data)?;
         let splash_data = Asset::get("splash_example.png").ok_or("Could not load splash")?;
         let splash = Texture2D::from_file_with_format(&splash_data.data, None);
+        let font_menu_data = Asset::get("Helltown-eg8p.ttf").ok_or("Could not load font")?;
+        let font_menu = load_ttf_font_from_bytes(&font_menu_data.data)?;
+
+        let font_score_data =
+            Asset::get("PinballChallengeDeluxe-ae6g.ttf").ok_or("Could not load font")?;
+        let font_score = load_ttf_font_from_bytes(&font_score_data.data)?;
 
         let backgrounds = Self::load_backgrounds()?;
         Ok(Resources {
             backgrounds,
-            font,
             splash,
+            font_menu,
+            font_score,
         })
     }
 
