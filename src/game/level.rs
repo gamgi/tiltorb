@@ -133,13 +133,17 @@ fn update_state(game: &mut GameState) -> Option<Event> {
             if let Some(current_hole) = ball.in_hole {
                 ball.active = false;
                 if game.get_goal_hole() == current_hole {
-                    return Some(Event::RoundCompleted);
+                    if game.progress.goal_index >= game.level.goals.len() - 1 {
+                        return Some(Event::GameCompleted);
+                    } else {
+                        return Some(Event::RoundCompleted);
+                    }
                 } else {
-                    if game.progress.balls_left > 0 {
+                    if game.progress.balls_left <= 0 {
+                        return Some(Event::GameEnded);
+                    } else {
                         game.progress.balls_left -= 1;
                         return Some(Event::RoundLost);
-                    } else {
-                        return Some(Event::GameEnded);
                     }
                 }
             }

@@ -17,6 +17,7 @@ pub enum State {
     Loading,
     Menu(GameState, MenuState),
     Game(GameState, DisplayState),
+    Score(GameState, DisplayState),
     Editor(GameState, EditorState),
     Terminating,
 }
@@ -28,6 +29,7 @@ pub enum Event {
     SplashTimeout,
     MenuSelected(String),
     GameEnded,
+    GameCompleted,
     RoundCompleted,
     RoundLost,
     EditorClosed,
@@ -53,8 +55,19 @@ impl State {
                 ),
                 _ => unreachable!(),
             },
-            (State::Game(_, _), Event::GameEnded) => {
-                return State::Menu(GameState::load("level_example.json"), MenuState::main());
+            (State::Game(game, _), Event::GameCompleted) => {
+                let score = game.progress.score;
+                return State::Score(
+                    game,
+                    DisplayState::messages(vec![
+                        &format!("score {}", score),
+                        &format!("score {}", score),
+                        "game over",
+                    ]),
+                );
+            }
+            (State::Game(game, _) | State::Score(game, _), Event::GameEnded) => {
+                return State::Menu(game, MenuState::main());
             }
             (State::Game(game, _), Event::RoundLost) => {
                 let display = match game.progress.balls_left {
@@ -264,6 +277,7 @@ pub struct GameProgressState {
 #[derive(Debug, PartialEq)]
 pub struct DisplayState {
     pub message: Option<String>,
+    pub messages: Vec<String>,
     pub start_time: f64,
 }
 
@@ -271,13 +285,22 @@ impl DisplayState {
     pub fn new() -> Self {
         DisplayState {
             message: None,
+            messages: vec![],
             start_time: 0.,
         }
     }
     pub fn message(message: &str) -> Self {
         DisplayState {
             message: Some(message.to_string()),
+            messages: vec![],
             start_time: get_time(),
+        }
+    }
+    pub fn messages(messages: Vec<&str>) -> Self {
+        DisplayState {
+            message: None,
+            messages: messages.iter().map(|msg| msg.to_string()).collect(),
+            start_time: 0.,
         }
     }
 }

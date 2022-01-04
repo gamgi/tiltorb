@@ -70,6 +70,15 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             draw(state);
             next_frame().await
         },
+        State::Score(_, _) => {
+            let start = get_time();
+            while get_time() - start < 4.5 {
+                update(state).await?;
+                draw(state);
+                next_frame().await;
+            }
+            Ok(Some(Event::GameEnded))
+        }
         _ => Ok(None),
     }
 }
@@ -97,7 +106,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
                 game::game::update_camera(game);
                 return_ok_if_some!(game::menu::update_menu(menu, &input));
             }
-            State::Game(game, display) => {
+            State::Game(game, display) | State::Score(game, display) => {
                 if input.escape {
                     return Ok(Some(Event::GameEnded));
                 }
@@ -146,7 +155,7 @@ fn draw(state: &State) {
             clear_background(BLACK);
             game::menu::draw_menu(&menu);
         }
-        State::Game(game, display) => {
+        State::Game(game, display) | State::Score(game, display) => {
             clear_background(BLACK);
             game::game::draw_game(&game);
             // debug::draw_debug();

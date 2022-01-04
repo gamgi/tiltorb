@@ -10,8 +10,13 @@ const FONT_HEIGHT: f32 = 0.57 * FONT_SIZE as f32;
 const MESSAGE_DURATION: f64 = 1.5; // sec
 
 pub fn update_display(display: &mut DisplayState) {
-    if display.message.is_some() && (get_time() - display.start_time) > MESSAGE_DURATION {
+    let timed_out = (get_time() - display.start_time) > MESSAGE_DURATION;
+    if display.message.is_some() && timed_out {
         display.message = None;
+    }
+    if display.messages.len() > 0 && timed_out {
+        display.message = display.messages.pop();
+        display.start_time = get_time();
     }
 }
 
