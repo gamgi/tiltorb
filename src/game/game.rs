@@ -9,7 +9,7 @@ use crate::{
 };
 use macroquad::prelude::*;
 
-pub const DARKGRAY_SHADOW: Color = Color::new(0.1, 0.1, 0.1, 0.5);
+pub const DARKGRAY_SHADOW: Color = Color::new(0., 0., 0., 0.5);
 
 pub fn update_game(game: &mut GameState, input: &Input, dt: f32) -> Option<Event> {
     update_camera(game);
@@ -25,10 +25,8 @@ pub fn update_camera(game: &GameState) {
     let scale = (screen_width() / screen_height()) / (SCREEN_W / SCREEN_H);
     let (w, h) = if scale >= 1.0 {
         (SCREEN_W * scale, SCREEN_H)
-        // (config::SCREEN_H * scale, config::SCREEN_W)
     } else {
         (SCREEN_W, SCREEN_H / scale)
-        // (config::SCREEN_H, config::SCREEN_W / scale)
     };
     let target = vec2(SCREEN_W / 2., h / 2.);
     set_camera(&Camera2D {
@@ -43,8 +41,7 @@ pub fn update_camera(game: &GameState) {
 
 pub fn draw_game(game: &GameState) {
     level::draw_background(game);
-    balls::draw_balls(&game.objects.balls, true);
     level::draw_holes(game);
+    balls::draw_balls(&game.objects.balls);
     rod::draw_rod(&game.objects.actuators, false);
-    balls::draw_balls(&game.objects.balls, false);
 }

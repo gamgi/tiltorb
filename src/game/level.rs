@@ -22,10 +22,10 @@ pub fn update_level(game: &mut GameState) -> Option<Event> {
 fn update_hole_physics(balls: &mut Vec<Ball>, holes: &Vec<Hole>) {
     let mut debug = storage::get_mut::<Vec<DebugData>>();
     for ball in balls.iter_mut() {
-        ball.in_hole = None;
         if !ball.active {
             continue;
         }
+        ball.in_hole = None;
         for (i, hole) in holes.iter().enumerate() {
             let is_last_hole = i == holes.len() - 1;
             // Determine nearest point on hole rim

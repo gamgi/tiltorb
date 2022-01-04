@@ -117,7 +117,7 @@ async fn update(state: &mut State) -> Result<Option<Event>> {
 fn calculate_frames(state: &State) -> (i32, f32) {
     let dt = get_frame_time();
     match state {
-        State::Game(_,_) => {
+        State::Game(_, _) => {
             // divide frame into substeps to improve physics collision handling
             let substeps = i32::max(1, (dt / TARGET_DELTATIME).ceil() as i32);
             (substeps, dt / substeps as f32)
@@ -149,7 +149,7 @@ fn draw(state: &State) {
         State::Game(game, display) => {
             clear_background(BLACK);
             game::game::draw_game(&game);
-            debug::draw_debug();
+            // debug::draw_debug();
             display::draw_display(&game, &display);
         }
         State::Editor(game, editor) => {

@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use crate::config::SCALE;
 use crate::{game::game::DARKGRAY_SHADOW, state::Ball};
 use macroquad::{math::Vec3, prelude::*};
@@ -17,18 +19,39 @@ pub fn update_balls(balls: &mut Vec<Ball>, dt: f32) {
     }
 }
 
-pub fn draw_balls(balls: &Vec<Ball>, shadow: bool) {
-    // pub fn draw_balls(game: &GameState, shadow: bool) {
-    // Balls
+pub fn draw_balls(balls: &Vec<Ball>) {
     for ref ball in balls.iter() {
-        if shadow {
+        // Wall shadow
+        let ball_shadow_pos = ball.pos.truncate()
+            + Vec2::new(
+                f32::max(0., ball.pos.z * 0.5),
+                f32::max(0., ball.pos.z * 0.1),
+            );
+        draw_circle(
+            ball_shadow_pos.x * SCALE,
+            ball_shadow_pos.y * SCALE,
+            BALL_RADIUS * SCALE,
+            DARKGRAY_SHADOW,
+        );
+        if ball.in_hole.is_some() {
+            // Hole shadow
+            let r = (ball.pos.z).clamp(-BALL_RADIUS, 0.) / (-BALL_RADIUS);
+            let shadow_r = BALL_RADIUS * (1. - (r * PI / 2.).sin());
             draw_circle(
-                ball.pos.x * SCALE + f32::max(0., ball.pos.z * SCALE * 0.5),
-                ball.pos.y * SCALE + f32::max(0., ball.pos.z * SCALE * 0.1),
+                ball.pos.x * SCALE,
+                ball.pos.y * SCALE,
                 BALL_RADIUS * SCALE,
-                DARKGRAY_SHADOW,
+                DARKGRAY,
+            );
+            // Ball
+            draw_circle(
+                ball.pos.x * SCALE,
+                ball.pos.y * SCALE,
+                shadow_r * SCALE,
+                LIGHTGRAY,
             );
         } else {
+            // Ball
             draw_circle(
                 ball.pos.x * SCALE,
                 ball.pos.y * SCALE,

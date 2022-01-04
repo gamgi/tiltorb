@@ -1,5 +1,5 @@
 use crate::{
-    config::{SCREEN_W,SCREEN_H},
+    config::{SCREEN_H, SCREEN_W},
     input::Input,
     resources::Resources,
     state::{Event, MenuState},
