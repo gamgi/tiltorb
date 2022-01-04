@@ -56,6 +56,7 @@ impl State {
                 _ => unreachable!(),
             },
             (State::Game(game, _), Event::GameCompleted) => {
+                let game = game.next_round();
                 let score = game.progress.score;
                 return State::Score(
                     game,
