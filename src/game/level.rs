@@ -131,10 +131,16 @@ fn update_state(game: &mut GameState) -> Option<Event> {
         }
         if ball.pos.z < -2. * BALL_RADIUS {
             if let Some(current_hole) = ball.in_hole {
+                ball.active = false;
                 if game.get_goal_hole() == current_hole {
                     return Some(Event::RoundCompleted);
                 } else {
-                    return Some(Event::RoundLost);
+                    if game.progress.balls_left > 0 {
+                        game.progress.balls_left -= 1;
+                        return Some(Event::RoundLost);
+                    } else {
+                        return Some(Event::GameEnded);
+                    }
                 }
             }
         }

@@ -3,9 +3,7 @@ use crate::{
     resources::Resources,
     state::{DisplayState, GameState},
 };
-use macroquad::{
-    experimental::collections::storage, prelude::*, time::get_time,
-};
+use macroquad::{experimental::collections::storage, prelude::*, time::get_time};
 
 const FONT_SIZE: u16 = 164;
 const FONT_HEIGHT: f32 = 0.57 * FONT_SIZE as f32;

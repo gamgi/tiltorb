@@ -57,7 +57,11 @@ impl State {
                 return State::Menu(GameState::load("level_example.json"), MenuState::main());
             }
             (State::Game(game, _), Event::RoundLost) => {
-                return State::Game(game.reset_round(), DisplayState::message("oops"));
+                let display = match game.progress.balls_left {
+                    balls if balls == 0 => DisplayState::message("last ball"),
+                    balls => DisplayState::message(&format!("{: >2} left", balls)),
+                };
+                return State::Game(game.reset_round(), display);
             }
             (State::Game(game, _), Event::RoundCompleted) => {
                 return State::Game(game.next_round(), DisplayState::message("great"));
@@ -127,6 +131,7 @@ impl Default for GameState {
                 start_time: get_time() + 1.,
                 goal_index: 0,
                 score: 0,
+                balls_left: 4,
             },
             objects: GameObjectState {
                 balls: vec![Ball::new()],
@@ -253,6 +258,7 @@ pub struct GameProgressState {
     pub goal_index: usize,
     pub start_time: f64,
     pub score: u16,
+    pub balls_left: u16,
 }
 
 #[derive(Debug, PartialEq)]
