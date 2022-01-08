@@ -1,8 +1,8 @@
 use std::f32::consts::PI;
 
 use crate::config::SCALE;
-use crate::{game::game::DARKGRAY_SHADOW, state::Ball};
-use macroquad::{math::Vec3, prelude::*};
+use crate::{game::game::DARKGRAY_SHADOW, resources::Resources, state::Ball};
+use macroquad::{experimental::collections::storage, math::Vec3, prelude::*};
 pub const BALL_RADIUS: f32 = 0.03;
 
 pub fn update_balls(balls: &mut Vec<Ball>, dt: f32) {
@@ -19,7 +19,8 @@ pub fn update_balls(balls: &mut Vec<Ball>, dt: f32) {
     }
 }
 
-pub fn draw_balls(balls: &Vec<Ball>) {
+pub fn draw_balls(balls: &Vec<Ball>, rod_angle: f32) {
+    let resources = storage::get_mut::<Resources>();
     for ref ball in balls.iter() {
         // Wall shadow
         let ball_shadow_pos = ball.pos.truncate()
@@ -33,30 +34,49 @@ pub fn draw_balls(balls: &Vec<Ball>) {
             BALL_RADIUS * SCALE,
             DARKGRAY_SHADOW,
         );
+        // Ball
+        draw_texture_ex(
+            resources.ball_bg,
+            (ball.pos.x - BALL_RADIUS) * SCALE,
+            (ball.pos.y - BALL_RADIUS) * SCALE,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(Vec2::new(BALL_RADIUS, BALL_RADIUS) * 2. * SCALE),
+                ..Default::default()
+            },
+        );
+        draw_texture_ex(
+            resources.ball_fg,
+            (ball.pos.x - BALL_RADIUS) * SCALE,
+            (ball.pos.y - BALL_RADIUS) * SCALE,
+            WHITE,
+            DrawTextureParams {
+                dest_size: Some(Vec2::new(BALL_RADIUS, BALL_RADIUS) * 2. * SCALE),
+                rotation: rod_angle,
+                ..Default::default()
+            },
+        );
+        // Hole shadow
         if ball.in_hole.is_some() {
-            // Hole shadow
             let r = (ball.pos.z).clamp(-BALL_RADIUS, 0.) / (-BALL_RADIUS);
-            let shadow_r = BALL_RADIUS * (1. - (r * PI / 2.).sin());
-            draw_circle(
+            let shadow_r = BALL_RADIUS * ((r * PI / 2.).sin());
+            draw_poly_lines(
                 ball.pos.x * SCALE,
                 ball.pos.y * SCALE,
-                BALL_RADIUS * SCALE,
-                DARKGRAY,
-            );
-            // Ball
-            draw_circle(
-                ball.pos.x * SCALE,
-                ball.pos.y * SCALE,
+                20,
+                (BALL_RADIUS - shadow_r / 2.) * SCALE + 1.,
+                0.,
                 shadow_r * SCALE,
-                LIGHTGRAY,
+                Color::from_rgba(40, 40, 40, 255),
             );
-        } else {
-            // Ball
-            draw_circle(
+            draw_poly_lines(
                 ball.pos.x * SCALE,
                 ball.pos.y * SCALE,
-                BALL_RADIUS * SCALE,
-                LIGHTGRAY,
+                20,
+                (BALL_RADIUS - shadow_r / 2.) * SCALE + 1.,
+                360. / 20. / 2.,
+                shadow_r * SCALE,
+                Color::from_rgba(40, 40, 40, 255),
             );
         }
     }

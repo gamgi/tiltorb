@@ -42,6 +42,6 @@ pub fn update_camera(game: &GameState) {
 pub fn draw_game(game: &GameState) {
     level::draw_background(game);
     level::draw_holes(game);
-    balls::draw_balls(&game.objects.balls);
+    balls::draw_balls(&game.objects.balls, rod::rod_angle(&game.objects.actuators));
     rod::draw_rod(&game.objects.actuators, false);
 }

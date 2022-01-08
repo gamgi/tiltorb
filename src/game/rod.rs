@@ -113,3 +113,8 @@ fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
     let delta_x = actuators[1].pos.x - actuators[0].pos.x;
     Vec3::new(delta_x, delta_y, 0.0).normalize()
 }
+
+pub fn rod_angle(actuators: &[Actuator; 2]) -> f32 {
+    let delta = actuators[1].pos - actuators[0].pos;
+    f32::atan2(delta.y, delta.x)
+}
