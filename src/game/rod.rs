@@ -16,6 +16,7 @@ use macroquad::{
 const ACTUATOR_VEL: f32 = 2.0; // m/s TODO does not match reality
 const ACTUATOR_STIFFNESS: f32 = 0.9;
 const ACTUATOR_DAMPING: f32 = 8.0;
+pub const ACTUATOR_WIDTH: f32 = 100. / SCALE; // px / scale
 pub const ACTUATOR_Z: f32 = BALL_RADIUS * 1.2;
 pub const ROD_RADIUS: f32 = 0.008;
 
@@ -84,7 +85,7 @@ pub fn draw_rod(actuators: &[Actuator; 2], rod_angle: f32) {
     let color = Color::from_rgba(10, 10 + (80. * (1. - p)) as u8, 10, 255);
     for ref actuator in actuators.iter() {
         draw_rectangle(
-            actuator.pos.x * SCALE + 5.,
+            (actuator.pos.x - ACTUATOR_WIDTH / 2.) * SCALE + 5.,
             actuator.pos.y * SCALE + 5.,
             90.0,
             140.0,
@@ -92,20 +93,25 @@ pub fn draw_rod(actuators: &[Actuator; 2], rod_angle: f32) {
         );
         draw_texture(
             resources.actuator_fg,
-            actuator.pos.x * SCALE,
+            (actuator.pos.x - ACTUATOR_WIDTH / 2.) * SCALE,
             actuator.pos.y * SCALE,
             WHITE,
         );
     }
 
     // Rod
-    draw_line(
-        actuators[0].pos.x * SCALE,
-        actuators[0].pos.y * SCALE,
-        actuators[1].pos.x * SCALE,
-        actuators[1].pos.y * SCALE,
-        ROD_RADIUS * 2.0 * SCALE,
-        LIGHTGRAY,
+    let rod_pos = (actuators[0].pos + actuators[1].pos) / 2.0;
+    let rod_length = SCALE * 1.5;
+    draw_texture_ex(
+        resources.rod,
+        rod_pos.x * SCALE - rod_length / 2.,
+        rod_pos.y * SCALE - ROD_RADIUS * SCALE,
+        WHITE,
+        DrawTextureParams {
+            dest_size: Some(Vec2::new(rod_length, ROD_RADIUS * 2. * SCALE)),
+            rotation: rod_angle,
+            ..Default::default()
+        },
     );
 }
 

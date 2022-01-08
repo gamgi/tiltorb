@@ -1,6 +1,7 @@
 use crate::{
     config::{SCALE, SCREEN_H, SCREEN_W},
     game::balls::BALL_RADIUS,
+    game::rod::ACTUATOR_WIDTH,
     resources::Asset,
 };
 use macroquad::{
@@ -114,11 +115,14 @@ impl GameState {
     pub fn reset_round(mut self) -> Self {
         self.objects.actuators = [
             Actuator {
-                pos: Vec2::new(0.0, (SCREEN_H - 60.0) / SCALE),
+                pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 60.0) / SCALE),
                 vel: 0.0,
             },
             Actuator {
-                pos: Vec2::new((SCREEN_W - 100.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                pos: Vec2::new(
+                    (SCREEN_W / SCALE) - ACTUATOR_WIDTH / 2.,
+                    (SCREEN_H - 60.0) / SCALE,
+                ),
                 vel: 0.0,
             },
         ];
@@ -151,11 +155,14 @@ impl Default for GameState {
                 balls: vec![Ball::new()],
                 actuators: [
                     Actuator {
-                        pos: Vec2::new(0.0, (SCREEN_H - 60.0) / SCALE),
+                        pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 60.0) / SCALE),
                         vel: 0.0,
                     },
                     Actuator {
-                        pos: Vec2::new((SCREEN_W - 100.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                        pos: Vec2::new(
+                            (SCREEN_W / SCALE) - ACTUATOR_WIDTH / 2.,
+                            (SCREEN_H - 60.0) / SCALE,
+                        ),
                         vel: 0.0,
                     },
                 ],

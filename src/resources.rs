@@ -13,6 +13,7 @@ pub struct Resources {
     pub ball_bg: Texture2D,
     pub actuator_fg: Texture2D,
     pub actuator_bg: Texture2D,
+    pub rod: Texture2D,
     pub splash: Texture2D,
     pub font_menu: Font,
     pub font_score: Font,
@@ -32,6 +33,9 @@ impl Resources {
         let actuator_bg_data = Asset::get("actuator_bg.png").ok_or("Could not load actuator")?;
         let actuator_bg = Texture2D::from_file_with_format(&actuator_bg_data.data, None);
 
+        let rod_data = Asset::get("rod.png").ok_or("Could not load rod")?;
+        let rod = Texture2D::from_file_with_format(&rod_data.data, None);
+
         let font_menu_data = Asset::get("Helltown-eg8p.ttf").ok_or("Could not load font")?;
         let font_menu = load_ttf_font_from_bytes(&font_menu_data.data)?;
 
@@ -47,6 +51,7 @@ impl Resources {
             actuator_fg,
             actuator_bg,
             splash,
+            rod,
             font_menu,
             font_score,
         })
