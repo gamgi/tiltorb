@@ -40,8 +40,9 @@ pub fn update_camera(game: &GameState) {
 }
 
 pub fn draw_game(game: &GameState) {
+    let rod_angle = rod::rod_angle(&game.objects.actuators);
     level::draw_background(game);
     level::draw_holes(game);
-    balls::draw_balls(&game.objects.balls, rod::rod_angle(&game.objects.actuators));
-    rod::draw_rod(&game.objects.actuators, false);
+    balls::draw_balls(&game.objects.balls, rod_angle);
+    rod::draw_rod(&game.objects.actuators, rod_angle);
 }

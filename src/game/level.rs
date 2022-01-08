@@ -4,7 +4,7 @@ use crate::{
     debug::DebugData,
     game::balls::BALL_RADIUS,
     resources::Resources,
-    state::{Ball, Event, GameProgressState, GameState, Hole},
+    state::{Ball, Event, GameState, Hole},
 };
 use macroquad::experimental::collections::storage;
 use macroquad::math::{Vec2, Vec3};

@@ -118,7 +118,7 @@ impl GameState {
                 vel: 0.0,
             },
             Actuator {
-                pos: Vec2::new((SCREEN_W - 60.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                pos: Vec2::new((SCREEN_W - 100.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
                 vel: 0.0,
             },
         ];
@@ -155,7 +155,7 @@ impl Default for GameState {
                         vel: 0.0,
                     },
                     Actuator {
-                        pos: Vec2::new((SCREEN_W - 60.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
+                        pos: Vec2::new((SCREEN_W - 100.0) / SCALE, (SCREEN_H - 60.0) / SCALE),
                         vel: 0.0,
                     },
                 ],

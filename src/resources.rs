@@ -11,6 +11,8 @@ pub struct Resources {
     pub backgrounds: HashMap<String, Texture2D>,
     pub ball_fg: Texture2D,
     pub ball_bg: Texture2D,
+    pub actuator_fg: Texture2D,
+    pub actuator_bg: Texture2D,
     pub splash: Texture2D,
     pub font_menu: Font,
     pub font_score: Font,
@@ -25,6 +27,11 @@ impl Resources {
         let ball_bg_data = Asset::get("ball_bg.png").ok_or("Could not load ball")?;
         let ball_bg = Texture2D::from_file_with_format(&ball_bg_data.data, None);
 
+        let actuator_fg_data = Asset::get("actuator_fg.png").ok_or("Could not load actuator")?;
+        let actuator_fg = Texture2D::from_file_with_format(&actuator_fg_data.data, None);
+        let actuator_bg_data = Asset::get("actuator_bg.png").ok_or("Could not load actuator")?;
+        let actuator_bg = Texture2D::from_file_with_format(&actuator_bg_data.data, None);
+
         let font_menu_data = Asset::get("Helltown-eg8p.ttf").ok_or("Could not load font")?;
         let font_menu = load_ttf_font_from_bytes(&font_menu_data.data)?;
 
@@ -37,6 +44,8 @@ impl Resources {
             backgrounds,
             ball_fg,
             ball_bg,
+            actuator_fg,
+            actuator_bg,
             splash,
             font_menu,
             font_score,

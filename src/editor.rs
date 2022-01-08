@@ -27,7 +27,7 @@ pub fn update_editor(game: &mut GameState, editor: &mut EditorState) -> Option<E
 pub fn draw_editor(game: &GameState, editor: &EditorState) {
     level::draw_background(game);
     level::draw_holes(game);
-    rod::draw_rod(&game.objects.actuators, false);
+    rod::draw_rod(&game.objects.actuators, 0.);
     draw_rectangle(0., 0., screen_width() * 2., 120., BLACK);
     let mouse = Vec2::from(mouse_position()) / SCALE * 2.;
     draw_text(

@@ -2,8 +2,8 @@ use crate::{
     config::SCALE,
     debug::DebugData,
     game::balls::BALL_RADIUS,
-    game::game::DARKGRAY_SHADOW,
     input::Input,
+    resources::Resources,
     state::{Actuator, Ball},
 };
 use macroquad::{
@@ -75,37 +75,38 @@ pub fn update_rod_physics(balls: &mut Vec<Ball>, actuators: &[Actuator; 2]) {
     }
 }
 
-pub fn draw_rod(actuators: &[Actuator; 2], shadow: bool) {
+pub fn draw_rod(actuators: &[Actuator; 2], rod_angle: f32) {
+    let resources = storage::get_mut::<Resources>();
     // Actuators
+
+    // Color  for actuator indicators
+    let p = interp_cubic_ease((rod_angle / std::f32::consts::PI * 180.).abs() / 2.);
+    let color = Color::from_rgba(10, 10 + (80. * (1. - p)) as u8, 10, 255);
     for ref actuator in actuators.iter() {
         draw_rectangle(
+            actuator.pos.x * SCALE + 5.,
+            actuator.pos.y * SCALE + 5.,
+            90.0,
+            140.0,
+            color,
+        );
+        draw_texture(
+            resources.actuator_fg,
             actuator.pos.x * SCALE,
             actuator.pos.y * SCALE,
-            60.0,
-            60.0,
-            GREEN,
+            WHITE,
         );
     }
-    // Seesaw
-    if shadow {
-        draw_line(
-            actuators[0].pos.x * SCALE + ACTUATOR_Z * SCALE * 0.5,
-            actuators[0].pos.y * SCALE + ACTUATOR_Z * SCALE * 0.1,
-            actuators[1].pos.x * SCALE + ACTUATOR_Z * SCALE * 0.5,
-            actuators[1].pos.y * SCALE + ACTUATOR_Z * SCALE * 0.1,
-            ROD_RADIUS * 2.0 * SCALE,
-            DARKGRAY_SHADOW,
-        );
-    } else {
-        draw_line(
-            actuators[0].pos.x * SCALE,
-            actuators[0].pos.y * SCALE,
-            actuators[1].pos.x * SCALE,
-            actuators[1].pos.y * SCALE,
-            ROD_RADIUS * 2.0 * SCALE,
-            LIGHTGRAY,
-        );
-    }
+
+    // Rod
+    draw_line(
+        actuators[0].pos.x * SCALE,
+        actuators[0].pos.y * SCALE,
+        actuators[1].pos.x * SCALE,
+        actuators[1].pos.y * SCALE,
+        ROD_RADIUS * 2.0 * SCALE,
+        LIGHTGRAY,
+    );
 }
 
 fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
@@ -117,4 +118,13 @@ fn seesaw_unit_vec(actuators: &[Actuator; 2]) -> Vec3 {
 pub fn rod_angle(actuators: &[Actuator; 2]) -> f32 {
     let delta = actuators[1].pos - actuators[0].pos;
     f32::atan2(delta.y, delta.x)
+}
+
+fn interp_cubic_ease(p: f32) -> f32 {
+    match p {
+        p if p <= 0. => 0.,
+        p if p >= 1. => 1.,
+        p if p < 0.5 => 4. * f32::powf(p, 3.),
+        p => 1. - f32::powf(-2. * p + 2., 3.) / 2.,
+    }
 }
