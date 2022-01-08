@@ -5,15 +5,29 @@ use crate::{
     state::{Event, MenuState},
 };
 use macroquad::{
-    experimental::collections::storage, prelude::*, text::measure_text, time::get_time,
+    audio::play_sound_once, experimental::collections::storage, prelude::*, text::measure_text,
+    time::get_time,
 };
 
 const FONT_SIZE: f32 = 96.;
 
 pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
+    let resources = storage::get_mut::<Resources>();
     if input.menu_up {
+        play_sound_once(
+            *resources
+                .sounds
+                .get("sound_example.wav")
+                .expect("Resource for sound_click not found"),
+        );
         menu.selected = (menu.selected as i32 - 1).rem_euclid(menu.options.len() as i32) as usize;
     } else if input.menu_down {
+        play_sound_once(
+            *resources
+                .sounds
+                .get("sound_example.wav")
+                .expect("Resource for sound_click not found"),
+        );
         menu.selected = (menu.selected + 1).rem_euclid(menu.options.len());
     }
 

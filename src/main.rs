@@ -10,6 +10,7 @@ mod editor;
 mod game;
 mod input;
 mod resources;
+mod sound;
 mod state;
 mod transition;
 mod utils;
@@ -36,6 +37,7 @@ async fn main() -> Result<()> {
         }
         run_with_transition(&mut state, true).await?;
         event = run(&mut state).await?;
+        sound::play_event_sound(&event);
         run_with_transition(&mut state, false).await?;
     }
     Ok::<(), _>(())

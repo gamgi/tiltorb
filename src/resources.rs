@@ -1,5 +1,8 @@
 use crate::Result;
-use macroquad::prelude::*;
+use macroquad::{
+    audio::{load_sound_from_bytes, Sound},
+    prelude::*,
+};
 use rust_embed::RustEmbed;
 use std::collections::HashMap;
 
@@ -15,6 +18,7 @@ pub struct Resources {
     pub actuator_bg: Texture2D,
     pub rod: Texture2D,
     pub splash: Texture2D,
+    pub sounds: HashMap<String, Sound>,
     pub font_menu: Font,
     pub font_score: Font,
 }
@@ -23,6 +27,7 @@ impl Resources {
     pub async fn new() -> Result<Self> {
         let splash_data = Asset::get("splash_example.png").ok_or("Could not load splash")?;
         let splash = Texture2D::from_file_with_format(&splash_data.data, None);
+
         let ball_fg_data = Asset::get("ball_fg.png").ok_or("Could not load ball")?;
         let ball_fg = Texture2D::from_file_with_format(&ball_fg_data.data, None);
         let ball_bg_data = Asset::get("ball_bg.png").ok_or("Could not load ball")?;
@@ -43,6 +48,7 @@ impl Resources {
             Asset::get("PinballChallengeDeluxe-ae6g.ttf").ok_or("Could not load font")?;
         let font_score = load_ttf_font_from_bytes(&font_score_data.data)?;
 
+        let sounds = Self::load_sounds().await?;
         let backgrounds = Self::load_backgrounds()?;
         Ok(Resources {
             backgrounds,
@@ -51,6 +57,7 @@ impl Resources {
             actuator_fg,
             actuator_bg,
             splash,
+            sounds,
             rod,
             font_menu,
             font_score,
@@ -71,5 +78,18 @@ impl Resources {
             );
         }
         Ok(backgrounds)
+    }
+
+    async fn load_sounds() -> Result<HashMap<String, Sound>> {
+        let mut sounds: HashMap<String, Sound> = HashMap::new();
+        let file_names =
+            Asset::iter().filter(|name| name.starts_with("sound_") && name.ends_with(".wav"));
+        for name in file_names {
+            let data = Asset::get(name.as_ref())
+                .ok_or(format!("Could not load background \"{}\"", name))?
+                .data;
+            sounds.insert(name.to_string(), load_sound_from_bytes(&data).await?);
+        }
+        Ok(sounds)
     }
 }
