@@ -167,8 +167,16 @@ fn draw(state: &State) {
                 WHITE,
             );
         }
-        State::Menu(_, menu) => {
+        State::Menu(game, menu) => {
             clear_background(BLACK);
+            game::game::draw_game(&game);
+            draw_rectangle(
+                0.,
+                0.,
+                config::SCREEN_W,
+                config::SCREEN_H,
+                Color::from_rgba(0, 0, 0, 100),
+            );
             game::menu::draw_menu(&menu);
         }
         State::Game(game, display) | State::Score(game, display) => {
