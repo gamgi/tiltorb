@@ -14,6 +14,7 @@ pub fn update_help(game: &mut GameState, input: &Input) {
         game.progress.show_help = false;
     }
 }
+
 pub fn draw_help(game: &GameState) {
     let resources = storage::get::<Resources>();
     let blinking = (get_time() * 5.).round().rem_euclid(2.) as u32 == 0;

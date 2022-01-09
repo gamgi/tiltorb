@@ -47,7 +47,10 @@ impl State {
             }
             (State::Menu(_, _), Event::MenuSelected(item)) => match item.as_str() {
                 "start" => {
-                    return State::Game(GameState::load("level_example.json"), DisplayState::new());
+                    return State::Game(
+                        GameState::load("level_example.json").with_help(),
+                        DisplayState::new(),
+                    );
                 }
                 "quit" => State::Terminating,
                 "editor" => State::Editor(
@@ -60,7 +63,7 @@ impl State {
                 let game = game.next_round();
                 let score = game.progress.score;
                 return State::Score(
-                    game,
+                    game.reset_round(),
                     DisplayState::messages(vec![
                         &format!("score {}", score),
                         &format!("score {}", score),
@@ -69,7 +72,7 @@ impl State {
                 );
             }
             (State::Game(game, _) | State::Score(game, _), Event::GameEnded) => {
-                return State::Menu(game, MenuState::main());
+                return State::Menu(game.reset_round(), MenuState::main());
             }
             (State::Game(game, _), Event::RoundLost) => {
                 let display = match game.progress.balls_left {
@@ -140,6 +143,12 @@ impl GameState {
     pub fn get_goal_hole(&self) -> usize {
         *self.level.goals.get(self.progress.goal_index).unwrap_or(&0)
     }
+
+    pub fn with_help(self) -> Self {
+        let mut state = GameState { ..self };
+        state.progress.show_help = true;
+        state
+    }
 }
 
 impl Default for GameState {
@@ -150,8 +159,7 @@ impl Default for GameState {
                 goal_index: 0,
                 score: 0,
                 balls_left: 4,
-                // show_help: false,
-                show_help: true,
+                show_help: false,
             },
             objects: GameObjectState {
                 balls: vec![Ball::new()],
