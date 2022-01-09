@@ -139,7 +139,7 @@ fn update_state(game: &mut GameState) -> Option<Event> {
                         return Some(Event::RoundCompleted);
                     }
                 } else {
-                    if game.progress.balls_left <= 0 {
+                    if game.progress.balls_left < 1 {
                         return Some(Event::GameEnded);
                     } else {
                         game.progress.balls_left -= 1;

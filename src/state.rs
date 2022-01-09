@@ -74,7 +74,7 @@ impl State {
             (State::Game(game, _), Event::RoundLost) => {
                 let display = match game.progress.balls_left {
                     balls if balls == 0 => DisplayState::message("last ball"),
-                    balls => DisplayState::message(&format!("{: >2} left", balls)),
+                    balls => DisplayState::message(&format!("{: >2} left", balls + 1)),
                 };
                 return State::Game(game.reset_round(), display);
             }
