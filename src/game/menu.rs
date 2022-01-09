@@ -3,10 +3,10 @@ use crate::{
     input::Input,
     resources::Resources,
     state::{Event, MenuState},
+    utils::draw_centered_text,
 };
 use macroquad::{
-    audio::play_sound_once, experimental::collections::storage, prelude::*, text::measure_text,
-    time::get_time,
+    audio::play_sound_once, experimental::collections::storage, prelude::*, time::get_time,
 };
 
 const FONT_SIZE: f32 = 96.;
@@ -53,12 +53,14 @@ pub fn draw_menu(menu: &MenuState) {
         if menu.selected == i {
             draw_centered_text(
                 text,
+                SCREEN_W / 2.,
                 y_start + FONT_SIZE + i as f32 * FONT_SIZE,
                 text_params,
             );
         } else {
             draw_centered_text(
                 text,
+                SCREEN_W / 2.,
                 y_start + FONT_SIZE + i as f32 * FONT_SIZE,
                 text_params,
             );
@@ -72,9 +74,4 @@ fn get_text_params(resources: &Resources, font_size: f32) -> TextParams {
         font: resources.font_menu,
         ..Default::default()
     }
-}
-
-fn draw_centered_text(text: &str, y: f32, text_params: TextParams) {
-    let text_size = measure_text(text, None, text_params.font_size as u16, 1.0);
-    draw_text_ex(text, SCREEN_W / 2. - text_size.width / 2.0, y, text_params);
 }

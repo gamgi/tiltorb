@@ -55,13 +55,14 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
         }
         State::Loading => {
             let resources_future = start_coroutine(async move {
-                let resources = resources::Resources::new().await.expect("Failed to load");
+                let resources = resources::Resources::new()
+                    .await
+                    .expect("Failed to load resources");
                 storage::store(resources);
             });
             storage::store(Vec::<DebugData>::new());
 
             while resources_future.is_done() == false {
-                update(state).await?;
                 draw(state);
                 next_frame().await;
             }
@@ -140,8 +141,21 @@ fn calculate_frames(state: &State) -> (i32, f32) {
 fn draw(state: &State) {
     match state {
         State::Loading => {
-            clear_background(BLACK);
-            draw_text("Loading", 30.0, 200.0, 30.0, WHITE);
+            let progress: f32 = (get_time() as f32 / 3.).clamp(0., 1.);
+            draw_rectangle(
+                config::SCREEN_W / 4. - 50.,
+                config::SCREEN_H / 4. - 10.,
+                100. * progress,
+                20.,
+                WHITE,
+            );
+            draw_text(
+                env!("CARGO_PKG_VERSION"),
+                config::SCREEN_W / 4. - 30.,
+                config::SCREEN_H / 2. - 20.,
+                30.0,
+                WHITE,
+            );
         }
         State::Splash => {
             clear_background(BLACK);
