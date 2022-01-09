@@ -142,6 +142,14 @@ fn draw(state: &State) {
     match state {
         State::Loading => {
             let progress: f32 = (get_time() as f32 / 3.).clamp(0., 1.);
+            draw_rectangle_lines(
+                config::SCREEN_W / 4. - 50.,
+                config::SCREEN_H / 4. - 10.,
+                100.,
+                20.,
+                1.,
+                WHITE,
+            );
             draw_rectangle(
                 config::SCREEN_W / 4. - 50.,
                 config::SCREEN_H / 4. - 10.,
