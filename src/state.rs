@@ -115,13 +115,13 @@ impl GameState {
     pub fn reset_round(mut self) -> Self {
         self.objects.actuators = [
             Actuator {
-                pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 60.0) / SCALE),
+                pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 100.0) / SCALE),
                 vel: 0.0,
             },
             Actuator {
                 pos: Vec2::new(
                     (SCREEN_W / SCALE) - ACTUATOR_WIDTH / 2.,
-                    (SCREEN_H - 60.0) / SCALE,
+                    (SCREEN_H - 100.0) / SCALE,
                 ),
                 vel: 0.0,
             },
@@ -150,18 +150,20 @@ impl Default for GameState {
                 goal_index: 0,
                 score: 0,
                 balls_left: 4,
+                // show_help: false,
+                show_help: true,
             },
             objects: GameObjectState {
                 balls: vec![Ball::new()],
                 actuators: [
                     Actuator {
-                        pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 60.0) / SCALE),
+                        pos: Vec2::new(ACTUATOR_WIDTH / 2., (SCREEN_H - 100.0) / SCALE),
                         vel: 0.0,
                     },
                     Actuator {
                         pos: Vec2::new(
                             (SCREEN_W / SCALE) - ACTUATOR_WIDTH / 2.,
-                            (SCREEN_H - 60.0) / SCALE,
+                            (SCREEN_H - 100.0) / SCALE,
                         ),
                         vel: 0.0,
                     },
@@ -280,6 +282,7 @@ pub struct GameProgressState {
     pub start_time: f64,
     pub score: u16,
     pub balls_left: u16,
+    pub show_help: bool,
 }
 
 #[derive(Debug, PartialEq)]

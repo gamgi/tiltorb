@@ -11,35 +11,31 @@ use std::collections::HashMap;
 pub struct Asset;
 
 pub struct Resources {
-    pub backgrounds: HashMap<String, Texture2D>,
-    pub ball_fg: Texture2D,
-    pub ball_bg: Texture2D,
     pub actuator_fg: Texture2D,
     pub actuator_bg: Texture2D,
+    pub backgrounds: HashMap<String, Texture2D>,
+    pub font_menu: Font,
+    pub font_score: Font,
+    pub ball_fg: Texture2D,
+    pub ball_bg: Texture2D,
+    pub key: Texture2D,
     pub rod: Texture2D,
     pub splash: Texture2D,
     pub sounds: HashMap<String, Sound>,
-    pub font_menu: Font,
-    pub font_score: Font,
 }
 
 impl Resources {
     pub async fn new() -> Result<Self> {
-        let splash_data = Asset::get("splash_example.png").ok_or("Could not load splash")?;
-        let splash = Texture2D::from_file_with_format(&splash_data.data, None);
-
-        let ball_fg_data = Asset::get("ball_fg.png").ok_or("Could not load ball")?;
-        let ball_fg = Texture2D::from_file_with_format(&ball_fg_data.data, None);
-        let ball_bg_data = Asset::get("ball_bg.png").ok_or("Could not load ball")?;
-        let ball_bg = Texture2D::from_file_with_format(&ball_bg_data.data, None);
-
         let actuator_fg_data = Asset::get("actuator_fg.png").ok_or("Could not load actuator")?;
         let actuator_fg = Texture2D::from_file_with_format(&actuator_fg_data.data, None);
         let actuator_bg_data = Asset::get("actuator_bg.png").ok_or("Could not load actuator")?;
         let actuator_bg = Texture2D::from_file_with_format(&actuator_bg_data.data, None);
 
-        let rod_data = Asset::get("rod.png").ok_or("Could not load rod")?;
-        let rod = Texture2D::from_file_with_format(&rod_data.data, None);
+        let backgrounds = Self::load_backgrounds()?;
+        let ball_fg_data = Asset::get("ball_fg.png").ok_or("Could not load ball")?;
+        let ball_fg = Texture2D::from_file_with_format(&ball_fg_data.data, None);
+        let ball_bg_data = Asset::get("ball_bg.png").ok_or("Could not load ball")?;
+        let ball_bg = Texture2D::from_file_with_format(&ball_bg_data.data, None);
 
         let font_menu_data = Asset::get("Helltown-eg8p.ttf").ok_or("Could not load font")?;
         let font_menu = load_ttf_font_from_bytes(&font_menu_data.data)?;
@@ -48,19 +44,28 @@ impl Resources {
             Asset::get("PinballChallengeDeluxe-ae6g.ttf").ok_or("Could not load font")?;
         let font_score = load_ttf_font_from_bytes(&font_score_data.data)?;
 
+        let key_data = Asset::get("key.png").ok_or("Could not load key")?;
+        let key = Texture2D::from_file_with_format(&key_data.data, None);
+
+        let rod_data = Asset::get("rod.png").ok_or("Could not load rod")?;
+        let rod = Texture2D::from_file_with_format(&rod_data.data, None);
+
+        let splash_data = Asset::get("splash_example.png").ok_or("Could not load splash")?;
+        let splash = Texture2D::from_file_with_format(&splash_data.data, None);
+
         let sounds = Self::load_sounds().await?;
-        let backgrounds = Self::load_backgrounds()?;
         Ok(Resources {
+            actuator_fg,
+            actuator_bg,
             backgrounds,
             ball_fg,
             ball_bg,
-            actuator_fg,
-            actuator_bg,
-            splash,
-            sounds,
-            rod,
             font_menu,
             font_score,
+            key,
+            rod,
+            splash,
+            sounds,
         })
     }
 

@@ -1,4 +1,5 @@
 use super::balls;
+use super::help;
 use super::level;
 use super::rod;
 use crate::{
@@ -14,6 +15,7 @@ pub const DARKGRAY_SHADOW: Color = Color::new(0., 0., 0., 0.5);
 pub fn update_game(game: &mut GameState, input: &Input, dt: f32) -> Option<Event> {
     update_camera(game);
 
+    help::update_help(game, input);
     rod::update_actuators(&mut game.objects.actuators, input, dt);
     rod::update_rod_physics(&mut game.objects.balls, &game.objects.actuators);
     return_if_some!(level::update_level(game));
@@ -45,4 +47,5 @@ pub fn draw_game(game: &GameState) {
     level::draw_holes(game);
     balls::draw_balls(&game.objects.balls, rod_angle);
     rod::draw_rod(&game.objects.actuators, rod_angle);
+    help::draw_help(game);
 }
