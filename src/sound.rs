@@ -1,8 +1,8 @@
-use crate::{resources::Resources, state::Event};
+use crate::{resources::SoundResources, state::Event};
 use macroquad::{audio::play_sound_once, experimental::collections::storage};
 
 pub fn play_event_sound(event: &Option<Event>) {
-    let resources = storage::get_mut::<Resources>();
+    let resources = storage::get_mut::<SoundResources>();
     if let Some(ev) = event {
         match ev {
             Event::GameCompleted => play_sound_once(

@@ -21,6 +21,11 @@ pub struct Resources {
     pub key: Texture2D,
     pub rod: Texture2D,
     pub splash: Texture2D,
+}
+
+// Separate resources for sounds since fonts are not Send,
+//  which breaks wasm compilation
+pub struct SoundResources {
     pub sounds: HashMap<String, Sound>,
 }
 
@@ -53,7 +58,6 @@ impl Resources {
         let splash_data = Asset::get("splash_example.png").ok_or("Could not load splash")?;
         let splash = Texture2D::from_file_with_format(&splash_data.data, None);
 
-        let sounds = Self::load_sounds().await?;
         Ok(Resources {
             actuator_fg,
             actuator_bg,
@@ -65,7 +69,6 @@ impl Resources {
             key,
             rod,
             splash,
-            sounds,
         })
     }
 
@@ -84,6 +87,14 @@ impl Resources {
         }
         Ok(backgrounds)
     }
+}
+
+impl SoundResources {
+    pub async fn new() -> Result<Self> {
+        Ok(SoundResources {
+            sounds: Self::load_sounds().await?,
+        })
+    }
 
     async fn load_sounds() -> Result<HashMap<String, Sound>> {
         let mut sounds: HashMap<String, Sound> = HashMap::new();
@@ -91,7 +102,7 @@ impl Resources {
             Asset::iter().filter(|name| name.starts_with("sound_") && name.ends_with(".wav"));
         for name in file_names {
             let data = Asset::get(name.as_ref())
-                .ok_or(format!("Could not load background \"{}\"", name))?
+                .ok_or(format!("Could not load sound \"{}\"", name))?
                 .data;
             sounds.insert(name.to_string(), load_sound_from_bytes(&data).await?);
         }

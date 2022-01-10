@@ -1,9 +1,4 @@
-use crate::{
-    config::{SCALE, SCREEN_H, SCREEN_W},
-    input::Input,
-    resources::Resources,
-    state::GameState,
-};
+use crate::{config::SCALE, input::Input, resources::Resources, state::GameState};
 use macroquad::{experimental::collections::storage, prelude::*};
 
 pub fn update_help(game: &mut GameState, input: &Input) {

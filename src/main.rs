@@ -54,6 +54,15 @@ async fn run(state: &mut State) -> Result<Option<Event>> {
             Ok(Some(Event::SplashTimeout))
         }
         State::Loading => {
+            draw(state);
+            next_frame().await;
+            // Sound resources (can not be loaded in coroutine)
+            let sound_resources = resources::SoundResources::new()
+                .await
+                .expect("Failed to load sound resources");
+            storage::store(sound_resources);
+
+            // Other resources (in coroutine)
             let resources_future = start_coroutine(async move {
                 let resources = resources::Resources::new()
                     .await
@@ -141,7 +150,7 @@ fn calculate_frames(state: &State) -> (i32, f32) {
 fn draw(state: &State) {
     match state {
         State::Loading => {
-            let progress: f32 = (get_time() as f32 / 3.).clamp(0., 1.);
+            let progress: f32 = (get_time() as f32 / 2.).clamp(0., 1.);
             draw_rectangle_lines(
                 config::SCREEN_W / 4. - 50.,
                 config::SCREEN_H / 4. - 10.,

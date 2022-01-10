@@ -1,7 +1,7 @@
 use crate::{
     config::{SCREEN_H, SCREEN_W},
     input::Input,
-    resources::Resources,
+    resources::{Resources, SoundResources},
     state::{Event, MenuState},
     utils::draw_centered_text,
 };
@@ -13,7 +13,7 @@ const FONT_SIZE_TITLE: f32 = 128.;
 const FONT_SIZE_MENU: f32 = 96.;
 
 pub fn update_menu(menu: &mut MenuState, input: &Input) -> Option<Event> {
-    let resources = storage::get_mut::<Resources>();
+    let resources = storage::get_mut::<SoundResources>();
     if input.menu_up {
         play_sound_once(
             *resources
