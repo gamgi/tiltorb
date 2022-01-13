@@ -1,5 +1,5 @@
 use crate::{
-    config::SCALE,
+    config::{SCALE, SCREEN_W},
     debug::DebugData,
     game::balls::BALL_RADIUS,
     input::Input,
@@ -101,7 +101,7 @@ pub fn draw_rod(actuators: &[Actuator; 2], rod_angle: f32) {
 
     // Rod
     let rod_pos = (actuators[0].pos + actuators[1].pos) / 2.0;
-    let rod_length = SCALE * 1.5;
+    let rod_length = SCREEN_W + rod_angle.sin().abs() * 150.;
     draw_texture_ex(
         resources.rod,
         rod_pos.x * SCALE - rod_length / 2.,
