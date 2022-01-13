@@ -66,7 +66,7 @@ pub fn draw_balls(balls: &Vec<Ball>, rod_angle: f32) {
                 20,
                 (BALL_RADIUS - shadow_r / 2.) * SCALE + 1.,
                 0.,
-                shadow_r * SCALE,
+                shadow_r * SCALE + 2.,
                 Color::from_rgba(40, 40, 40, 255),
             );
             draw_poly_lines(
@@ -75,7 +75,7 @@ pub fn draw_balls(balls: &Vec<Ball>, rod_angle: f32) {
                 20,
                 (BALL_RADIUS - shadow_r / 2.) * SCALE + 1.,
                 360. / 20. / 2.,
-                shadow_r * SCALE,
+                shadow_r * SCALE + 2.,
                 Color::from_rgba(40, 40, 40, 255),
             );
         }
