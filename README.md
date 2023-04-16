@@ -2,6 +2,8 @@
 
 Precision arcade game written in Rust.
 
+Check the [playable demo](https://mystifying-poincare-f9db92.netlify.app/tiltorb.html) at Netlify.
+
 # Acknowledgements
 
 I want to express my gratitude towards
